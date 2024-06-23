@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación API TCC - Lessons</title>
+
+    <style>
+        .method.post {
+            background-color: #5cb85c;
+            color: white;
+        }
+
+        .method.get {
+            background-color: #337ab7;
+            color: white;
+        }
+
+        .method.delete {
+            background-color: #d9534f;
+            color: white;
+        }
+
+        .method.string {
+            background-color: #7c7c7c;
+            color: white;
+        }
+
+        .method.required {
+            background-color: #b04a4a;
+            color: white;
+        }
+
+        .method {
+            padding: 6px 12px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+    </style>
+
+    <!-- Minified version -->
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+
+</head>
+
+<body>
+
+    <header>
+        <%- include('../template/header'); -%>
+
+            <h1>Lessons (Lecciones)</h1>
+    </header>
+
+    <div>
+        <h2>Obtener todas las lecciones del usuario </h2>
+        <p>Obtén un token temporal para poder realizar peticiones a la API.</p>
+        <h3>HTTP Request</h3>
+        <p class="notice">
+            <span class="method post">POST</span>
+            <a href="<%= host %>/api/login">
+                <%= host %>/api/login
+            </a>
+        </p>
+
+        <h3>Query Parameters</h3>
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <td>parameter</td>
+                        <td>description</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>email</td>
+                        <td><span class="method string">strgin</span> <span class="method required">required</span>
+                            example: email-name@youdomain.com
+                            <p>Un email valido</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>password</td>
+                        <td><span class="method string">strgin</span> <span class="method required">required</span>
+                            example: youPassword
+                            <p>Password valido</p>
+                        </td>
+                    </tr>
+
+
+                </tbody>
+            </table>
+        </figure>
+    </div>
+
+    <div>
+        <h2>Registrar un usuario nuevo</h2>
+        <p>Obten una cuenta nueva en la app y un token.</p>
+        <h3>HTTP Request</h3>
+        <p class="notice">
+            <span class="method post">POST</span>
+            <a href="<%= host %>/api/register">
+                <%= host %>/api/register
+            </a>
+        </p>
+
+        <h3>Query Parameters</h3>
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <td>parameter</td>
+                        <td>description</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>name</td>
+                        <td><span class="method string">strgin</span> <span class="method required">required</span>
+                            example: You Name
+                            <p>Un nombre valido si caracteres especiales</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>email</td>
+                        <td><span class="method string">strgin</span> <span class="method required">required</span>
+                            example: email-name@youdomain.com
+                            <p>Un email valido</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>password</td>
+                        <td><span class="method string">strgin</span> <span class="method required">required</span>
+                            example: youPassword
+                            <p>Password valido</p>
+                        </td>
+                    </tr>
+
+
+                </tbody>
+            </table>
+        </figure>
+    </div>
+
+
+    <div>
+        <h2>Maestros - Teachers</h2>
+        <h3>Clases Virtuales</h3>
+        <p>Obten todas las claes virtuales del maestro.</p>
+        <h4>HTTP Request</h4>
+        <p class="notice">
+            <span class="method get">GET</span>
+            <a href="<%= host %>/api/teacher/all-rooms/{id}">
+                <%= host %>/api/teacher/all-rooms/{id}
+            </a>
+        </p>
+
+        <h4>Query Parameters</h4>
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <td>parameter</td>
+                        <td>description</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td><span class="method string">strgin</span> <span class="method required">required</span>
+                            example: <%= host %>/api/teacher/all-rooms/1
+                                <p>Un id valido si caracteres especiales</p>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </figure>
+
+
+        <h3>Crear nueva Clase Virtual</h3>
+        <p>Crea una clase virtual para los alumnos.</p>
+        <h4>HTTP Request</h4>
+        <p class="notice">
+            <span class="method post">POST</span>
+            <a href="<%= host %>/api/teacher/add-virtual-room">
+                <%= host %>/api/teacher/add-virtual-room
+            </a>
+        </p>
+
+        <h4>Query Parameters</h4>
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <td>parameter</td>
+                        <td>description</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>name</td>
+                        <td><span class="method string">strgin</span> <span class="method required">required</span>
+                            example: Aula 1
+                            <p>Se necesita proporcionar un nombre de aula</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>level</td>
+                        <td><span class="method string">strgin</span> <span class="method required">required</span>
+                            example: Principiante, Avanzado etc.
+                            <p>Se necesita proporcionar un nivel de aula solo</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>desc</td>
+                        <td><span class="method string">strgin</span> <span class="method required">required</span>
+                            example: Esta es la descripción de esta aula 1
+                            <p>Se necesita proporcionar una descripción</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>id</td>
+                        <td><span class="method string">strgin</span> <span class="method required">required</span>
+                            example: 1
+                            <p>Se necesita proporcionar una id de usuario valida</p>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </figure>
+
+        <h3>Crear nueva Clase Virtual</h3>
+        <p>Crea una clase virtual para los alumnos.</p>
+        <h4>HTTP Request</h4>
+        <p class="notice">
+            <span class="method post">POST</span>
+            <a href="<%= host %>/api/teacher/delete-virtual-room/{id}">
+                <%= host %>/api/teacher/delete-virtual-room/{id}
+            </a>
+        </p>
+
+        <h4>Query Parameters</h4>
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <td>parameter</td>
+                        <td>description</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td><span class="method string">strgin</span> <span class="method required">required</span>
+                            example: 1
+                            <p>Se necesita proporcionar un id de aula</p>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </figure>
+
+
+    </div>
+
+</body>
+
+</html>

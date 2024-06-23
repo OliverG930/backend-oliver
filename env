@@ -1,0 +1,7 @@
+PORT=4000
+DB_HOST=localhost
+DB_USER=tcc
+DB_PASSWORD='proyectoTcc01##'
+SECRET='seckret'
+DB=tcc
+SALT_ROUND=10

@@ -61,7 +61,7 @@ router.post("/update/:lesson", security(), IsTeacher(), async (req, res) => {
 })
 
 
-router.post("/delete/:lesson", security(), IsTeacher(), async (req, res) => {
+router.delete("/delete/:lesson", security(), IsTeacher(), async (req, res) => {
     const { lesson } = req.params
 
     await controller.remove(lesson)

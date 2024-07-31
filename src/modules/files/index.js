@@ -11,7 +11,7 @@ const security = require('../../middlewares/security')
 //filename: guarda el archivo con el nombre original pero antes agrega un suffix unico
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './uploads')
+        cb(null, './src/public/uploads')
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + Math.round(Math.random() * 1E9)
@@ -25,10 +25,12 @@ const upload = multer({ storage: storage })
 router.post("/upload/:aula/:leccion", security(), upload.single("file"), async (req, res) => {
 
     const { file, user, params } = req
-    console.log(req)
     const aula_id = params.aula
     const leccion_id = params.leccion
     const user_id = user.usuario_id
+
+    if (!aula_id) { resposes.error(req, res, { message: "No aula id" }, 500) }
+    if (!leccion_id) { resposes.error(req, res, { message: "No leccion id" }, 500) }
 
     const data = {
         file: file,
@@ -37,11 +39,43 @@ router.post("/upload/:aula/:leccion", security(), upload.single("file"), async (
         leccion_id: leccion_id
     }
 
-    await controller.saveFileOnDB(data)
-
-    return resposes.success(req, res, { message: "Successfully uploaded files" }, 200)
+    try {
+        await controller.save(data).then(result => {
+            return resposes.success(req, res, { message: "Successfully uploaded files", insertId: result.insertId }, 200)
+        })
+    } catch (e) {
+        console.log(e.message)
+        return
+    }
 })
 
+
+router.post("/upload/audio/:aula/:leccion", security(), upload.any("file"), async (req, res) => {
+
+    const { files, user, params } = req
+    const aula_id = params.aula
+    const leccion_id = params.leccion
+    const user_id = user.usuario_id
+
+    if (!aula_id) { resposes.error(req, res, { message: "No aula id" }, 500) }
+    if (!leccion_id) { resposes.error(req, res, { message: "No leccion id" }, 500) }
+
+    const data = {
+        file: files[0],
+        user_id: user_id,
+        aula_id: aula_id,
+        leccion_id: leccion_id
+    }
+
+    try {
+        const result = await controller.save(data)
+
+        resposes.success(req, res, { result, data }, 200)
+    } catch (e) {
+        console.log(e.message)
+        return
+    }
+})
 
 //esta ruta se encarga de entregar el archivo desde el servidor al usuario, security se encarga de que solo de archivos
 //a los usuarios autenticados
@@ -50,6 +84,15 @@ router.get("/download/:fileID", security(), async (req, res) => {
     const fileID = params.fileID
     const result = await controller.getFileFromDB(fileID)
     res.download(result[0].ruta_archivo)
+})
+
+router.get("/:fileID", async (req, res) => {
+    const { params } = req
+    const fileID = params.fileID
+    const result = await controller.getFileFromDB(fileID)
+
+    resposes.success(req, res, result, 200)
+    //res.download(result[0].ruta_archivo)
 })
 
 

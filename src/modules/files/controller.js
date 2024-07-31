@@ -2,7 +2,7 @@ const db = require("../../DB/crud")
 
 const TABLES = require("../../utils/tables")
 
-const saveFileOnDB = async (data) => {
+const save = async (data) => {
 
     const myData = {
         name: data.file.filename,
@@ -25,4 +25,4 @@ const deleteFileFromDB = (fileID) => {
     return db.deleteWhereID(TABLES.FILES, { archivo_id: fileID })
 }
 
-module.exports = { saveFileOnDB, getFileFromDB, deleteFileFromDB }
+module.exports = { save, getFileFromDB, deleteFileFromDB }

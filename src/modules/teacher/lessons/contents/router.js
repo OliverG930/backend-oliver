@@ -26,7 +26,7 @@ router.post('/create/:lesson', security(), IsTeacher(), async (req, res) => {
     const data = {
         lesson_id: lesson,
         type: body?.type,
-        value: body?.content
+        value: body?.value
     }
 
     await controller.create(data)

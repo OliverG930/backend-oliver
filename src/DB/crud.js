@@ -19,10 +19,34 @@ const select = (table, data) => {
     })
 }
 
+const selectWithJoin = (table_one, table_two, condition, where) => {
+    return new Promise((_res, _rej) => {
+
+        const query = `
+            SELECT * FROM ${table_one}
+            JOIN ${table_two} ON ${condition}
+            WHERE ${Object.keys(where).map(key => `${key} = ?`).join(' AND ')}
+        `
+        // Extraer los valores de la condición WHERE
+        const values = Object.values(where);
+        connection.query(query, values, (err, result) => {
+            return err ? _rej(err) : _res(result)
+        })
+    })
+}
+
 const selectAll = (table) => {
     return new Promise((_res, _rej) => {
         connection.query(`select * from ${table}`, (err, result) => {
             return err ? _rej(err) : _res(result[0])
+        })
+    })
+}
+
+const get = (table) => {
+    return new Promise((_res, _rej) => {
+        connection.query(`select * from ${table}`, (err, result) => {
+            return err ? _rej(err) : _res(result)
         })
     })
 }
@@ -33,6 +57,32 @@ const insert = (table, data) => {
     return new Promise((_res, _rej) => {
         connection.query(`INSERT INTO ${table} SET ?`, data, (err, result) => {
             return err ? _rej(err) : _res(result)
+        })
+    })
+}
+
+const insertWhere = (table, data, where) => {
+    // Construir la parte de la consulta WHERE dinámicamente
+    const conditions = Object.keys(where).map(key => `${key} = ?`).join(' AND ');
+    const values = Object.values(where);
+
+    const checkQuery = `SELECT COUNT(*) AS count FROM ${table} WHERE ${conditions}`;
+
+    return new Promise((_res, _rej) => {
+        connection.query(checkQuery, values, (err, results) => {
+            if (err) {
+                return _rej(err);
+            }
+
+            if (results[0].count > 0) {
+                return _res({ message: 'Data already exists', exists: true });
+            }
+
+            // Si no existen, realiza la inserción
+            const insertQuery = `INSERT INTO ${table} SET ?`;
+            connection.query(insertQuery, data, (err, result) => {
+                return err ? _rej(err) : _res(result);
+            });
         })
     })
 }
@@ -62,5 +112,8 @@ module.exports = {
     selectOneWhere,
     select,
     deleteWhereID,
-    selectAll
+    selectAll,
+    get,
+    insertWhere,
+    selectWithJoin
 }

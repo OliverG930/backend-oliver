@@ -2,7 +2,7 @@ const crud = require("../../../DB/crud")
 const { LESSONS } = require("../../../utils/tables")
 
 function all(room) {
-    return crud.select(LESSONS, room)
+    return crud.select(LESSONS, { room: room })
 }
 
 function get(id) {

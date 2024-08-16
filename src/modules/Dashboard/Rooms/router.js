@@ -35,8 +35,6 @@ router.get("/enrolled", security(), async (req, res, next) => {
 
 router.post("/enroll", security(), async (req, res, next) => {
 
-
-    console.log(req.body)
     const insert = controller.enroll(req.body)
 
     insert.then(response => {

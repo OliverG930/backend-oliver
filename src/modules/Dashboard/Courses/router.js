@@ -1,16 +1,14 @@
 const express = require("express")
 const router = express.Router()
 const responses = require("../../../red/responses")
-const controller = require("./controller")
+const { getCourseTasks } = require("./controller")
 
 const security = require("../../../middlewares/security")
 
 
 router.get("/", security(), (req, res) => {
     const { user } = req
-
-
-    responses.success(req, res, { messaage: `Hello ${user.nombre}`, user }, 200)
+    responses.success(req, res, { message: `Hello ${user.nombre}`, user }, 200)
 })
 
 
@@ -19,7 +17,7 @@ router.get("/:id", security(), async (req, res) => {
 
     const { id } = params
 
-    const result = await controller.getCourseTasks(id);
+    const result = await getCourseTasks(id);
 
     responses.success(req, res, { result }, 200)
 })

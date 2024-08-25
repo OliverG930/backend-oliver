@@ -3,7 +3,7 @@
 const mysql = require('mysql2')
 const config = require('../config')
 
-const CONECTION_LOST = config.mysql.connection_lost
+const CONNECTION_LOST = config.mysql.connection_lost
 
 const db_config = {
     host: config.mysql.host,
@@ -11,7 +11,6 @@ const db_config = {
     password: config.mysql.password,
     database: config.mysql.db,
 }
-
 
 const conn = () => {
     let connection = mysql.createConnection(db_config)
@@ -21,12 +20,12 @@ const conn = () => {
             console.log("[db:err] ", err)
             setTimeout(conn, 2000)
         } else {
-            console.log('mysql connected!')
+            console.log('[db] mysql connected!')
         }
     })
 
     connection.on('error', err => {
-        if (err.code === CONECTION_LOST) {
+        if (err.code === CONNECTION_LOST) {
             conn()
         } else {
             throw err

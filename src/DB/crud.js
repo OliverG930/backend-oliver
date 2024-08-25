@@ -2,6 +2,10 @@ const mysql = require('./mysql')
 
 const connection = mysql.conn()
 
+function getConnection() {
+    return connection;
+}
+
 //selecciona de la tabla el primer dato de la consulta recibido desde el  parametro data con este formato {id_usaurio: 1}
 const selectOneWhere = (table, data) => {
     return new Promise((_res, _rej) => {
@@ -115,5 +119,6 @@ module.exports = {
     selectAll,
     get,
     insertWhere,
-    selectWithJoin
+    selectWithJoin,
+    getConnection
 }

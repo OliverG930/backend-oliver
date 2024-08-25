@@ -1,8 +1,8 @@
-const mysql = require('../../../DB/mysql')
+const { getConnection } = require('../../../DB/crud')
 
-const connection = mysql.conn()
+function getCourseTasks(id) {
 
-const getCourseTasks = (id) => {
+    const connection = getConnection()
 
 
     /**

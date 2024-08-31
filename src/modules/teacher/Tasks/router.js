@@ -16,13 +16,10 @@ router.get("/add/:id", async (request, response) => {
     responses.success(request, response, { message: "hello", insertId }, 200)
 })
 
-router.post("/add", async (request, response) => {
-
-
-    const { body } = request
-
-
-    responses.success(request, response, { message: "hello", body }, 200)
+router.post("/add/:id", async (request, response) => {
+    const { id } = request.params
+    const { insertId } = await controller.addNewTask(id)
+    responses.success(request, response, { insertId }, 200)
 })
 
 module.exports = router

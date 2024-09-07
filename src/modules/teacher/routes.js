@@ -4,6 +4,7 @@ const rooms_router = require("./routes/rooms")
 const lessons = require("./lessons/router")
 const contents = require("./lessons/contents/router")
 const tasksRouter = require("./Tasks/router")
+const reportsRouter = require("./reports/index")
 const security = require('../../middlewares/security')
 const responses = require('../../red/responses')
 
@@ -15,6 +16,7 @@ router.use(rooms_router)
 router.use("/lessons", lessons)
 router.use("/lessons/contents/", contents)
 router.use("/tasks", tasksRouter)
+router.use("/reports", reportsRouter)
 
 module.exports = router
 

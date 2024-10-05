@@ -18,7 +18,7 @@ router.post('/resume', async (req, res) => {
         messages: [
             {
                 role: "system",
-                content: "You are a helpful teacher designed to output JSON.",
+                content: "You are a helpful English teacher designed to produce JSON.",
             },
             {
                 role: "user", content: messageRes
@@ -73,19 +73,19 @@ router.post('/generate/:amount', async (req, res) => {
 
 
     const messageRes = `crea ${cantidad} ejercicios para afianzar el aprendizaje del ingles, siguiendo los siguientes puntos
-1. Responde solo el JSON nada mas.
-2. responde solo los ejercicios.
-3. en cada ejercicio agrega 3 opciones.
-4. el formato de los ejercicios debe tener: title, question, options, answer.
-5. el title y question deben estar en espanol.
-6. en cada ejercicio agrega el ejercicio correcto según el indice de las opciones.
-7. no olvides que el answer debe se el indice de la options correcta.
+        1. Responde solo el JSON nada mas.
+        2. responde solo los ejercicios.
+        3. en cada ejercicio agrega 3 opciones.
+        4. el formato de los ejercicios debe tener: title, question, options, answer.
+        5. el title y question deben estar en espanol.
+        6. en cada ejercicio agrega el ejercicio correcto según el indice de las opciones.
+        7. no olvides que el answer debe se el indice de la options correcta.
 
-estos son los datos del ultimo test de ingles de este alumno:
+        estos son los datos del ultimo test de ingles de este alumno:
 
-${body}
+        ${body}
 
-`
+        `;
 
     const completion = await openai.chat.completions.create({
         messages: [
@@ -104,12 +104,58 @@ ${body}
     responses.success(req, res, { res: JSON.parse(completion.choices[0].message.content) }, 200)
 })
 
-const sleep = ms => new Promise(r => setTimeout(r, ms))
+router.post("/gen/exam", async (req, res) => {
 
-router.get('/test-connect', async (req, res) => {
-    await sleep(5000)
+    const { amount, level } = req.body;
 
-    responses.success(req, res, { message: 'hola mundo' }, 200)
-})
+    if (!amount) {
+        responses.error(req, res, { message: "amount required" }, 500);
+    }
+
+    if (!level) {
+        responses.error(req, res, { message: "level required" }, 500);
+    }
+
+    const message = `
+    Genera un examen de inglés de nivel ${level} en formato JSON. El examen debe incluir ${amount} preguntas de selección múltiple, cada una con entre 3 y 4 opciones de respuesta. Asegúrate de lo siguiente:
+    Las preguntas deben ser sobre temas básicos de gramática y vocabulario en inglés (como verbos, preposiciones, preguntas comunes, etc.).
+    Cada pregunta debe tener una única respuesta correcta.
+    El formato debe ser el siguiente:
+    json
+    Copiar código
+    {
+        "asks": [
+            {
+                "ask": "Escribe aquí la pregunta, solo la pregunta y nada mas.",
+                "answers": ["Opción 1", "Opción 2", "Opción 3"],
+                "correct": [índice de la respuesta correcta],
+                "type": "multiple_choice",
+                "points": [número de puntos para esta pregunta]
+            }
+        ]
+    }
+    El campo 'correct' debe ser el índice (empezando desde 0) de la respuesta correcta.
+    El campo 'points' debe indicar la cantidad de puntos que vale cada pregunta.
+    Asegúrate de que las preguntas sean adecuadas para a1 y cubran gramática y vocabulario básicos."
+        `;
+
+    const completion = await openai.chat.completions.create({
+        messages: [
+            {
+                role: "system",
+                content: "You are a helpful English teacher designed to produce JSON.",
+            },
+            {
+                role: "user", content: message
+            },
+        ],
+        model: "gpt-4o",
+        response_format: { type: "json_object" },
+    })
+
+
+    responses.success(req, res, JSON.parse(completion.choices[0].message.content), 200);
+
+});
 
 module.exports = router

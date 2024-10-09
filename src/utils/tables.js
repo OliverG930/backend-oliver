@@ -6,6 +6,7 @@ module.exports = {
     FILES: "tcc.archivos",
     COURSES: "tcc.courses",
     COURSES_AULA: "tcc.courses.aula",
-    TASKS: "tcc.tareas"
+    TASKS: "tcc.tareas",
+    EXAMS: "tcc.exams",
 
 }

@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const responses = require('../../../red/responses')
 const security = require('../../../middlewares/security')
-const { insert, select } = require('../../../DB/crud')
+const { insert, select, deleteWhereID } = require('../../../DB/crud')
 const tables = require('../../../utils/tables')
 
 function getExams(roomID) {
@@ -29,5 +29,19 @@ router.post("/save", security(), async (req, res) => {
     const save = await saveExam({ exam, config, roomID });
     return responses.success(req, res, { message: "success", save }, 200)
 })
+
+
+function deleteExam(examID) {
+    return deleteWhereID(tables.EXAMS, { id: examID })
+}
+router.post("/delete", security(), async (req, res) => {
+
+    const { body } = req;
+
+    const result = await deleteExam(body.examID)
+
+    return responses.success(req, res, { result }, 200)
+})
+
 
 module.exports = router

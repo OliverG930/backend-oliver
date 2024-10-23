@@ -104,9 +104,10 @@ router.post('/generate/:amount', async (req, res) => {
     responses.success(req, res, { res: JSON.parse(completion.choices[0].message.content) }, 200)
 })
 
+
 router.post("/gen/exam", async (req, res) => {
 
-    const { amount, level } = req.body;
+    const { amount, level, title } = req.body;
 
     if (!amount) {
         responses.error(req, res, { message: "amount required" }, 500);
@@ -116,27 +117,47 @@ router.post("/gen/exam", async (req, res) => {
         responses.error(req, res, { message: "level required" }, 500);
     }
 
-    const message = `
-    Genera un examen de inglés de nivel ${level} en formato JSON. El examen debe incluir ${amount} preguntas de selección múltiple, cada una con entre 3 y 4 opciones de respuesta. Asegúrate de lo siguiente:
-    Las preguntas deben ser sobre temas básicos de gramática y vocabulario en inglés (como verbos, preposiciones, preguntas comunes, etc.).
-    Cada pregunta debe tener una única respuesta correcta.
-    El formato debe ser el siguiente:
-    json
-    Copiar código
-    {
-        "asks": [
-            {
-                "ask": "Escribe aquí la pregunta, solo la pregunta y nada mas.",
-                "answers": ["Opción 1", "Opción 2", "Opción 3"],
-                "correct": [índice de la respuesta correcta],
-                "type": "multiple_choice",
-                "points": [número de puntos para esta pregunta]
-            }
-        ]
+    if (!title) {
+        responses.error(req, res, { message: "title required" }, 500);
     }
-    El campo 'correct' debe ser el índice (empezando desde 0) de la respuesta correcta.
-    El campo 'points' debe indicar la cantidad de puntos que vale cada pregunta.
-    Asegúrate de que las preguntas sean adecuadas para a1 y cubran gramática y vocabulario básicos."
+
+    const message = `
+    Genera un examen de inglés en formato JSON para el nivel ${level}, que debe ser A1, y debe estar relacionado con el tema "${title}". El examen debe incluir ${amount} preguntas de selección múltiple, siguiendo estos criterios:
+
+  1. Cada pregunta debe tener entre 3 y 4 opciones de respuesta.
+  2. Solo una respuesta es correcta por pregunta.
+  3. Las preguntas deben enfocarse en gramática y vocabulario básicos adecuados para el nivel ${level}.
+  4. El examen debe cubrir aspectos esenciales del tema seleccionado.
+  5. El campo 'correct' debe ser el índice (empezando desde 0) de la respuesta correcta.
+  6. El campo 'points' debe especificar la cantidad de puntos que vale cada pregunta.
+  7. El campo de ask debería ser en español a no ser que necesite ser en ingles.
+
+  El formato JSON debe seguir esta estructura:
+
+  {
+    "asks": [
+      {
+        "ask": "Escribe aquí la pregunta, de forma clara y directa.",
+        "answers": ["Opción 1", "Opción 2", "Opción 3", "Opción 4"],
+        "correct": [índice de la respuesta correcta],
+        "type": "multiple_choice",
+        "points": [valor numérico de los puntos]
+      },
+      {
+        "ask": "Escribe aquí otra pregunta.",
+        "answers": ["Opción 1", "Opción 2", "Opción 3"],
+        "correct": [índice de la respuesta correcta],
+        "type": "multiple_choice",
+        "points": [valor numérico de los puntos]
+      }
+    ]
+  }
+
+  Asegúrate de que:
+  - Las preguntas sean adecuadas para el nivel ${level}.
+  - Los puntos estén bien distribuidos y reflejen la dificultad de la pregunta (generalmente 1-2 puntos).
+  - Las respuestas incorrectas tengan sentido y sean razonablemente plausibles para evitar que las respuestas correctas sean demasiado obvias.
+
         `;
 
     const completion = await openai.chat.completions.create({

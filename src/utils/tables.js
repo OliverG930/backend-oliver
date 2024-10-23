@@ -8,5 +8,4 @@ module.exports = {
     COURSES_AULA: "tcc.courses.aula",
     TASKS: "tcc.tareas",
     EXAMS: "tcc.exams",
-
 }

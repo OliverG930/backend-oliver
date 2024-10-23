@@ -24,7 +24,7 @@ const register = async ({ name, email, password }) => {
     const user = {
         nombre: name,
         correo: email,
-        contrasenia: newPasswordHash,//genera la contrasenia cifrada
+        contrasenia: newPasswordHash, //genera la contrasenia cifrada
         rol_id: 1 //usuario por defecto
     }
 

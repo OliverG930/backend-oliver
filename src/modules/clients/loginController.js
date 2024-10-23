@@ -30,7 +30,7 @@ const login = async (body) => {
             //se asigna el token al usuario
             return { ...user, token: auth.asignToken({ ...data }) }
         } else {
-            //sino envia un error
+            //sino envía un error
             return { error: 'invalid password' }
         }
 

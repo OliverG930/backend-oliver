@@ -11,6 +11,7 @@ const authRouter = require('./modules/auth')
 const filesRouter = require('./modules/files')
 const gptRouter = require('./modules/gpt')
 const dashRouter = require('./modules/Dashboard')
+const pdfRouter = require("./modules/pdf")
 const errors = require('./red/errors')
 
 
@@ -60,6 +61,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/files', filesRouter)
 app.use('/api/gpt', gptRouter)
 app.use('/api/dashboard', dashRouter)
+app.use('/api/pdf', pdfRouter)
 
 
 app.use(errors)

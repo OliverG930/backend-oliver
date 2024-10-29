@@ -1,6 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const responses = require('../../red/responses')
+const { writeFileSync } = require("node:fs")
+
+
 const OpenAI = require('openai');
 
 const openai = new OpenAI({ apiKey: process.env.API_KEY });
@@ -132,6 +135,7 @@ router.post("/gen/exam", async (req, res) => {
   6. El campo 'points' debe especificar la cantidad de puntos que vale cada pregunta.
   7. El campo de ask debería ser en español a no ser que necesite ser en ingles.
 
+
   El formato JSON debe seguir esta estructura:
 
   {
@@ -149,7 +153,17 @@ router.post("/gen/exam", async (req, res) => {
         "correct": [índice de la respuesta correcta],
         "type": "multiple_choice",
         "points": [valor numérico de los puntos]
-      }
+      },
+    {
+        "ask": "Escribe aquí otra pregunta.",
+        "answers": [
+            "Verdadero",
+            "Falso"
+        ],
+        "correct":[índice de la respuesta correcta],
+        "type": "true_false",
+        "points": [valor numérico de los puntos]
+    },
     ]
   }
 
@@ -178,5 +192,74 @@ router.post("/gen/exam", async (req, res) => {
     responses.success(req, res, JSON.parse(completion.choices[0].message.content), 200);
 
 });
+
+router.post("/gen/audio", async (req, res) => {
+    // Generate an audio response to the given prompt
+    const response = await openai.chat.completions.create({
+        model: "gpt-4o-audio-preview",
+        modalities: ["text", "audio"],
+        audio: { voice: "alloy", format: "mp3" },
+        messages: [
+            {
+                role: "user",
+                content: "La capital de Australia?"
+            }
+        ]
+    });
+
+    // Write audio data to a file
+    writeFileSync(
+        "dog.wav",
+        Buffer.from(response.choices[0].message.audio.data, 'base64'),
+        { encoding: "utf-8" }
+    );
+
+    responses.success(req, res, response.choices[0].message.audio.transcript, 200);
+})
+
+router.post("/exam/analice", async (req, res) => {
+
+
+    const { body } = req
+
+    const examen = body
+
+    const messageRes = `
+
+    1. analiza el siguiente json y asigna los points especificados de cada respuesta correcta y responde un json con el siguiente contenido.
+    {
+        totalPointsCorrect: ,
+        recommendations ,
+        totalPoints ,
+        percentage
+    }
+
+    2. estas son las respuestas del examen: ${JSON.stringify(examen)}
+
+    3. solo responde un json
+    4. la recommendations deben estar en español, se lo mas breve posible.
+    5. totalPoints es el total de la suma de los puntos correctos e incorrectos
+    6. añade también un porcentaje de las respuestas correctas según el total!
+
+    `
+    console.log(JSON.stringify(examen))
+
+    const completion = await openai.chat.completions.create({
+        messages: [
+            {
+                role: "system",
+                content: "You are a helpful English teacher designed to produce JSON.",
+            },
+            {
+                role: "user", content: messageRes
+            },
+        ],
+        model: "gpt-4o",
+        response_format: { type: "json_object" },
+    })
+
+    // console.log(JSON.stringify(examen))
+    responses.success(req, res, { res: completion.choices[0].message.content }, 200)
+})
 
 module.exports = router

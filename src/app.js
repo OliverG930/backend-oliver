@@ -12,6 +12,7 @@ const filesRouter = require('./modules/files')
 const gptRouter = require('./modules/gpt')
 const dashRouter = require('./modules/Dashboard')
 const pdfRouter = require("./modules/pdf")
+const filesToChatgptRouter = require("./modules/files-to-gpt")
 const errors = require('./red/errors')
 
 
@@ -62,6 +63,7 @@ app.use('/api/files', filesRouter)
 app.use('/api/gpt', gptRouter)
 app.use('/api/dashboard', dashRouter)
 app.use('/api/pdf', pdfRouter)
+app.use('/api/files-to-chatgpt', filesToChatgptRouter)
 
 
 app.use(errors)

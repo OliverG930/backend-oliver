@@ -2,9 +2,12 @@ const db = require('../../../DB/crud')
 const { err_messages } = require('../../../utils/messages')
 const TABLES = require("../../../utils/tables")
 
-const getAllRooms = (usuario_id) => {
+const getRooms = (usuario_id) => {
     return db.select(TABLES.AULA_VIRTUAL, { usuario_id: usuario_id })
 }
+
+//crea una nueva room según el usuario
+const createRoom = (usuario_id) => db.insert(TABLES.AULA_VIRTUAL, { usuario_id: usuario_id })
 
 const createVirtualRoom = (body) => {
     const data = {
@@ -15,6 +18,11 @@ const createVirtualRoom = (body) => {
     }
 
     return db.insert(TABLES.AULA_VIRTUAL, data)
+}
+
+const deleteRoom = async (aula_id) => {
+
+    return await db.deleteWhereID(TABLES.AULA_VIRTUAL, { aula_id })
 }
 
 
@@ -42,7 +50,8 @@ const updateRoom = async (id_room, data) => {
 module.exports = {
     createVirtualRoom,
     updateRoom,
-    getAllRooms,
-    deleteVirtualRoom,
+    getRooms,
+    createRoom,
+    deleteRoom,
     getRoom
 }

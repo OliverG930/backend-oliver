@@ -10,10 +10,13 @@ const save = async (data) => {
         ruta_archivo: data.file.path,
         aula_id: data.aula_id,
         user_id: data.user_id,
-        leccion_id: data.leccion_id
     }
 
     return db.insert(TABLES.FILES, myData)
+}
+
+const getFileWithRoomId = (aula_id) => {
+    return db.select(TABLES.FILES, { aula_id: aula_id });
 }
 
 const getFileFromDB = async (fileID) => {
@@ -25,4 +28,4 @@ const deleteFileFromDB = (fileID) => {
     return db.deleteWhereID(TABLES.FILES, { archivo_id: fileID })
 }
 
-module.exports = { save, getFileFromDB, deleteFileFromDB }
+module.exports = { save, getFileFromDB, deleteFileFromDB, getFileWithRoomId }

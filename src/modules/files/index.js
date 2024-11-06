@@ -49,6 +49,49 @@ router.post("/upload/:aula/:leccion", security(), upload.single("file"), async (
     }
 })
 
+router.post("/upload/:aula", security(), upload.single("file"), async (req, res) => {
+
+    const { file, user, params } = req
+    const aula_id = params.aula
+    const user_id = user.usuario_id
+
+    if (!aula_id) { resposes.error(req, res, { message: "No aula id" }, 500) }
+
+    const data = {
+        file: file,
+        user_id: user_id,
+        aula_id: aula_id
+    }
+
+    try {
+        await controller.save(data).then(result => {
+            return resposes.success(req, res, { message: "Successfully uploaded files", insertId: result.insertId }, 200)
+        })
+    } catch (e) {
+        console.log(e.message)
+        return
+    }
+})
+
+router.get("/get/:aula", security(), async (req, res) => {
+
+    const { user, params } = req
+    const aula_id = params.aula
+    const user_id = user.usuario_id
+
+    if (!aula_id) { resposes.error(req, res, { message: "No aula id" }, 500) }
+
+    try {
+        await controller.getFileWithRoomId(aula_id).then(result => {
+
+            console.log(result)
+            return resposes.success(req, res, { files: result }, 200)
+        })
+    } catch (e) {
+        console.log(e.message)
+        return
+    }
+})
 
 router.post("/upload/audio/:aula/:leccion", security(), upload.any("file"), async (req, res) => {
 

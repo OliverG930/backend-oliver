@@ -1,63 +1,78 @@
 const express = require('express')
 const router = express.Router()
 const seguridad = require('../seguridad')
-const resposes = require('../../../red/responses')
+const responses = require('../../../red/responses')
 const controller = require('../controllers/rooms')
+const { message } = require('../../../utils/messages')
+const { isTeacher } = require('../isTeacher')
 
-//consulta todas las entradas de la db que contengan el id del usuario seleccionado
-router.get('/all-rooms/:id', seguridad(), async (req, res, next) => {
-    //id de usuario recibido por parametro id
-    const usuario_id = req.params.id
+//crear rooms para el teacher
+router.post('/rooms/create', seguridad(), isTeacher(), async (req, res) => {
 
+    await controller.createRoom(req.user.usuario_id)
+        .then((result) => {
+            responses.success(req, res, result, 200)
+        })
+        .catch((err) => {
 
-    if (!usuario_id || usuario_id === '') {
-        return resposes.error(req, res, { message: 'user ID required!' })
-    }
-
-    const getAll = await controller.getAllRooms(usuario_id)
-    return resposes.success(req, res, getAll, 200)
+            console.error(err.message)
+            responses.error(req, res, { message: "error al intentar guardar" }, 500)
+        });
 })
 
-router.post('/add-virtual-room', seguridad(), async (req, res, next) => {
-    const body = req.body
-    const createVirtualRoom = await controller.createVirtualRoom(body)
-    return resposes.success(req, res, { message: 'added correctly', insertId: createVirtualRoom.insertId }, 200)
+
+
+//lista todas las clases o rooms para el teacher
+router.get('/rooms/all', seguridad(), isTeacher(), async (req, res) => {
+    const { user } = req
+    const rooms = await controller.getRooms(user.usuario_id)
+    return responses.success(req, res, rooms, 200)
 })
 
-router.delete('/delete-virtual-room/:id', seguridad(), async (req, res, next) => {
-    const virtual_room_id = req.params.id
-    const usuario_id = req.user.usuario_id
-    const checkVirtualRoom = await controller.deleteVirtualRoom(virtual_room_id, usuario_id)
+router.get('/room/:id', seguridad(), isTeacher(), async (req, res) => {
+    const room_id = req.params.id
 
-    const response = checkVirtualRoom.error ?
-        resposes.error(req, res, { message: checkVirtualRoom.error }, 200) :
-        resposes.success(req, res, { message: 'borrando', response: checkVirtualRoom }, 200)
-
-    return response
-})
-
-router.get('/room/:id', seguridad(), async (req, res, next) => {
-    //id de usuario recibido por parametro id
-    const roomId = req.params.id
-
-    const get = await controller.getRoom(roomId, req)
-    return resposes.success(req, res, get, 200)
+    console.log(room_id)
+    const room = await controller.getRoom(room_id)
+    responses.success(req, res, room, 200)
 })
 
 //editar clases virtuales
-router.put("/room/:id", seguridad(), async (req, res) => {
+router.put("/room", seguridad(), isTeacher(), async (req, res) => {
 
-    const room_id = req.params.id
     const body = req.body
 
-    await controller.getRoom(room_id).then(result => {
-        return result
-            ? controller.updateRoom(room_id, body)
-                .then(result => resposes.success(req, res, result, 200))
-                .catch((e) => resposes.error(req, res, e.message, 500))
-            : resposes.error(req, res, { message: "not match" }, 500)
+    const { aula_id } = body
 
-    }).catch((e) => resposes.error(req, res, e.message, 500))
+    await controller.updateRoom(aula_id, body)
+        .then(result => responses.success(req, res, result, 200))
+        .catch((err) => responses.error(req, res, { message: "imposible actualizar" }, 500))
+
+    // await controller.getRoom(room_id).then(result => {
+    //     return result
+    //         ? controller.updateRoom(room_id, body)
+    //             .then(result => responses.success(req, res, result, 200))
+    //             .catch((e) => responses.error(req, res, e.message, 500))
+    //         : responses.error(req, res, { message: "not match" }, 500)
+
+    // }).catch((e) => responses.error(req, res, e.message, 500))
+
+})
+
+//crear rooms para el teacher
+router.post('/rooms/delete', seguridad(), isTeacher(), async (req, res) => {
+
+    const { body } = req
+
+    controller.deleteRoom(body.aula_id)
+        .then(result => {
+            responses.success(req, res, result, 200)
+        })
+        .catch((err) => {
+
+            console.error(err, err.message)
+            responses.error(req, res, { message: "Error al borrar" }, 401)
+        })
 
 })
 

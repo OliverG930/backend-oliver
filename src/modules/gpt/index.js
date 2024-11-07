@@ -180,73 +180,76 @@ router.post("/generate/exam", async (req, res) => {
     }
 
     const message = `
-    Genera ${amount} preguntas para un examen de inglés en formato JSON para el nivel ${level}, que debe ser A1, y debe estar relacionado con el tema "${title}". El examen debe incluir ${amount} preguntas de tipo ${type}, siguiendo estos criterios:
+  Genera un conjunto de preguntas en formato JSON para un examen de inglés de nivel ${level}, con un total de ${amount} preguntas. Todas deben estar enfocadas en el tema "${title}" y seguir los criterios detallados a continuación.
 
-  1. Cada pregunta debe tener entre 3 y 4 opciones de respuesta.
-  2. Solo una respuesta es correcta por pregunta.
-  3. Las preguntas deben enfocarse en gramática y vocabulario básicos adecuados para el nivel ${level}.
-  4. El examen debe cubrir aspectos esenciales del tema seleccionado.
-  5. El campo 'correct' debe ser el índice (empezando desde 0) de la respuesta correcta.
-  6. El campo 'points' debe especificar la cantidad de puntos que vale cada pregunta.
-  7. El campo de ask debería ser en español a no ser que necesite ser en ingles.
+  **Instrucciones Generales para la Creación de Preguntas:**
+  1. **Formato de Preguntas:**
+      - Cada pregunta debe tener entre 3 y 4 opciones de respuesta si el tipo lo permite (por ejemplo, multiple_choice).
+      - Solo una de las respuestas debe ser correcta.
+      - La pregunta debe estar en español, salvo que necesite ser en inglés (e.g., para evaluar vocabulario o gramática específicos).
+      - Las respuestas incorrectas deben ser plausibles y adecuadas para el nivel ${level} para evitar que la respuesta correcta sea obvia.
 
+  2. **Cobertura y Temática del Examen:**
+      - Asegúrate de cubrir aspectos clave del tema "${title}" para evaluar una comprensión general y precisa de este contenido.
 
-  estos son los formatos de los distintos tipos para que agregues según la cantidad de preguntas en este caso "${amount}"
+  3. **Estructura JSON de Cada Pregunta:**
+      - Usa el formato JSON específico para el tipo de pregunta solicitado (${type}) y genera solo preguntas de este tipo.
+      - El campo "correct" debe contener el índice (empezando desde 0) de la respuesta correcta, o el valor correcto en preguntas de tipo "typing".
+      - El campo "points" debe indicar los puntos asignados a cada pregunta (generalmente entre 1 y 2, en función de la dificultad).
 
-    Tipo : multiple_choice
-      {
-        "ask": "Escribe aquí la pregunta, de forma clara y directa.",
-        "answers": ["Opción 1", "Opción 2", "Opción 3", "Opción 4"],
-        "correct": [índice de la respuesta correcta],
-        "type": "multiple_choice",
-        "points": [valor numérico de los puntos]
-      }
+  4. **Ejemplos de Formato para Cada Tipo de Pregunta:**
+     
+     - **Tipo: multiple_choice**
+       \`\`\`json
+       {
+         "ask": "Escribe aquí una pregunta clara y directa.",
+         "answers": ["Opción 1", "Opción 2", "Opción 3", "Opción 4"],
+         "correct": [índice de la respuesta correcta],
+         "type": "multiple_choice",
+         "points": [valor numérico de los puntos]
+       }
+       \`\`\`
 
-    Tipo : true_false
-      {
-        "ask": "Escribe aquí otra pregunta.",
-        "answers": [
-            "Verdadero",
-            "Falso"
-        ],
-        "correct":[índice de la respuesta correcta],
-        "type": "true_false",
-        "points": [valor numérico de los puntos]
-    }
+     - **Tipo: true_false**
+       \`\`\`json
+       {
+         "ask": "Escribe aquí una pregunta de verdadero o falso.",
+         "answers": ["Verdadero", "Falso"],
+         "correct": [índice de la respuesta correcta],
+         "type": "true_false",
+         "points": [valor numérico de los puntos]
+       }
+       \`\`\`
 
-    Tipo : true_false
-      {
-        "ask": "Escribe aquí otra pregunta.",
-        "answers": [
-            "Verdadero",
-            "Falso"
-        ],
-        "correct":[índice de la respuesta correcta],
-        "type": "true_false",
-        "points": [valor numérico de los puntos]
-    }
+     - **Tipo: typing**
+       \`\`\`json
+       {
+         "ask": "Escribe aquí la pregunta para que el estudiante proporcione la respuesta escrita.",
+         "correct": "respuesta correcta esperada",
+         "type": "typing",
+         "points": [valor numérico de los puntos]
+       }
+       \`\`\`
 
-    Tipo : typing
-    {
-        "ask": "Escribe la pregunta.",
-        "correct": [valor correcto],
-        "type": "typing",
-        "points": [valor numérico de los puntos]
-    }
+  5. **Formato del JSON Final del Examen:**
+     - Organiza las preguntas en un solo JSON, con todas incluidas en un arreglo bajo el campo "questions":
+       \`\`\`json
+       {
+         "questions": [
+           { /* pregunta 1 */ },
+           { /* pregunta 2 */ },
+           ...
+         ]
+       }
+       \`\`\`
 
+  **Instrucciones adicionales:**
+  - Usa únicamente el tipo de pregunta especificado: ${type}.
+  - Asegúrate de que todas las preguntas, respuestas y puntuación sigan las especificaciones indicadas.
+  - Solo devuelve el JSON final generado, sin información adicional.
+  - que sean preguntas relevantes para un examen de ingles.
 
-    formato del JSON
-    {"questions": [aquí las preguntas generadas]}
-    
-
-  Asegúrate de que:
-  - Las preguntas sean adecuadas para el nivel ${level}.
-  - Los puntos estén bien distribuidos y reflejen la dificultad de la pregunta (generalmente 1-2 puntos).
-  - Las respuestas incorrectas tengan sentido y sean razonablemente plausibles para evitar que las respuestas correctas sean demasiado obvias.
-  -solo devuelve la pregunta según el tipo: ${type} listado en el json anterior
-
-        `;
-
+`;
     const completion = await openai.chat.completions.create({
         messages: [
             {

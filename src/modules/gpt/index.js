@@ -69,43 +69,7 @@ ${JSON.stringify(body)}
 })
 
 
-router.post('/generate/:amount', async (req, res) => {
-    const { body, params } = req
 
-    const cantidad = parseInt(params.amount) || 10
-
-
-    const messageRes = `crea ${cantidad} ejercicios para afianzar el aprendizaje del ingles, siguiendo los siguientes puntos
-        1. Responde solo el JSON nada mas.
-        2. responde solo los ejercicios.
-        3. en cada ejercicio agrega 3 opciones.
-        4. el formato de los ejercicios debe tener: title, question, options, answer.
-        5. el title y question deben estar en espanol.
-        6. en cada ejercicio agrega el ejercicio correcto según el indice de las opciones.
-        7. no olvides que el answer debe se el indice de la options correcta.
-
-        estos son los datos del ultimo test de ingles de este alumno:
-
-        ${body}
-
-        `;
-
-    const completion = await openai.chat.completions.create({
-        messages: [
-            {
-                role: "system",
-                content: "You are a helpful teacher designed to output JSON.",
-            },
-            {
-                role: "user", content: messageRes
-            },
-        ],
-        model: "gpt-4o",
-        response_format: { type: "json_object" },
-    })
-
-    responses.success(req, res, { res: JSON.parse(completion.choices[0].message.content) }, 200)
-})
 
 
 router.post("/gen/exam", async (req, res) => {
@@ -192,6 +156,154 @@ router.post("/gen/exam", async (req, res) => {
     responses.success(req, res, JSON.parse(completion.choices[0].message.content), 200);
 
 });
+
+
+router.post("/generate/exam", async (req, res) => {
+
+    const { amount, level, title, type } = req.body;
+
+
+    if (!amount) {
+        return responses.error(req, res, { message: "amount required" }, 500);
+    }
+
+    if (!level) {
+        return responses.error(req, res, { message: "level required" }, 500);
+    }
+
+    if (!title) {
+        return responses.error(req, res, { message: "title required" }, 500);
+    }
+
+    if (!type) {
+        return responses.error(req, res, { message: "type required" }, 500);
+    }
+
+    const message = `
+    Genera ${amount} preguntas para un examen de inglés en formato JSON para el nivel ${level}, que debe ser A1, y debe estar relacionado con el tema "${title}". El examen debe incluir ${amount} preguntas de tipo ${type}, siguiendo estos criterios:
+
+  1. Cada pregunta debe tener entre 3 y 4 opciones de respuesta.
+  2. Solo una respuesta es correcta por pregunta.
+  3. Las preguntas deben enfocarse en gramática y vocabulario básicos adecuados para el nivel ${level}.
+  4. El examen debe cubrir aspectos esenciales del tema seleccionado.
+  5. El campo 'correct' debe ser el índice (empezando desde 0) de la respuesta correcta.
+  6. El campo 'points' debe especificar la cantidad de puntos que vale cada pregunta.
+  7. El campo de ask debería ser en español a no ser que necesite ser en ingles.
+
+
+  estos son los formatos de los distintos tipos para que agregues según la cantidad de preguntas en este caso "${amount}"
+
+    Tipo : multiple_choice
+      {
+        "ask": "Escribe aquí la pregunta, de forma clara y directa.",
+        "answers": ["Opción 1", "Opción 2", "Opción 3", "Opción 4"],
+        "correct": [índice de la respuesta correcta],
+        "type": "multiple_choice",
+        "points": [valor numérico de los puntos]
+      }
+
+    Tipo : true_false
+      {
+        "ask": "Escribe aquí otra pregunta.",
+        "answers": [
+            "Verdadero",
+            "Falso"
+        ],
+        "correct":[índice de la respuesta correcta],
+        "type": "true_false",
+        "points": [valor numérico de los puntos]
+    }
+
+    Tipo : true_false
+      {
+        "ask": "Escribe aquí otra pregunta.",
+        "answers": [
+            "Verdadero",
+            "Falso"
+        ],
+        "correct":[índice de la respuesta correcta],
+        "type": "true_false",
+        "points": [valor numérico de los puntos]
+    }
+
+    Tipo : typing
+    {
+        "ask": "Escribe la pregunta.",
+        "correct": [valor correcto],
+        "type": "typing",
+        "points": [valor numérico de los puntos]
+    }
+
+
+    formato del JSON
+    {"questions": [aquí las preguntas generadas]}
+    
+
+  Asegúrate de que:
+  - Las preguntas sean adecuadas para el nivel ${level}.
+  - Los puntos estén bien distribuidos y reflejen la dificultad de la pregunta (generalmente 1-2 puntos).
+  - Las respuestas incorrectas tengan sentido y sean razonablemente plausibles para evitar que las respuestas correctas sean demasiado obvias.
+  -solo devuelve la pregunta según el tipo: ${type} listado en el json anterior
+
+        `;
+
+    const completion = await openai.chat.completions.create({
+        messages: [
+            {
+                role: "system",
+                content: "You are a helpful English teacher designed to produce JSON.",
+            },
+            {
+                role: "user", content: message
+            },
+        ],
+        model: "gpt-4o",
+        response_format: { type: "json_object" },
+    })
+
+    responses.success(req, res, JSON.parse(completion.choices[0].message.content), 200);
+
+});
+
+
+router.post('/generate/:amount', async (req, res) => {
+    const { body, params } = req
+
+    const cantidad = parseInt(params.amount) || 10
+
+
+    const messageRes = `crea ${cantidad} ejercicios para afianzar el aprendizaje del ingles, siguiendo los siguientes puntos
+        1. Responde solo el JSON nada mas.
+        2. responde solo los ejercicios.
+        3. en cada ejercicio agrega 3 opciones.
+        4. el formato de los ejercicios debe tener: title, question, options, answer.
+        5. el title y question deben estar en espanol.
+        6. en cada ejercicio agrega el ejercicio correcto según el indice de las opciones.
+        7. no olvides que el answer debe se el indice de la options correcta.
+
+        estos son los datos del ultimo test de ingles de este alumno:
+
+        ${body}
+
+        `;
+
+    const completion = await openai.chat.completions.create({
+        messages: [
+            {
+                role: "system",
+                content: "You are a helpful teacher designed to output JSON.",
+            },
+            {
+                role: "user", content: messageRes
+            },
+        ],
+        model: "gpt-4o",
+        response_format: { type: "json_object" },
+    })
+
+    responses.success(req, res, { res: JSON.parse(completion.choices[0].message.content) }, 200)
+})
+
 
 router.post("/gen/audio", async (req, res) => {
     // Generate an audio response to the given prompt

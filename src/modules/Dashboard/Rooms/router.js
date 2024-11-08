@@ -75,4 +75,16 @@ router.get("/lessons/:id", async (req, res) => {
     responses.success(req, res, { message: id, result }, 200)
 })
 
+
+router.get("/:id/exams", security(), async (req, res) => {
+
+    const { params, user } = req
+    const id = params.id
+
+    const examsResult = await controller.getExams(id)
+
+    responses.success(req, res, { message: "hello", exams: examsResult }, 200)
+})
+
+
 module.exports = router

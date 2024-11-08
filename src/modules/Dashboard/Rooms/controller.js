@@ -32,4 +32,9 @@ const getLessons = (id) => {
     return db.select(TABLES.LESSONS_CONTENT, { lesson_id: id })
 }
 
-module.exports = { all, enroll, getEnrolleds, get, unroll, getRoomLessons, getLessons }
+const getExams = (id) => {
+    console.log(TABLES.EXAMS, { roomID: id })
+    return db.select(TABLES.EXAMS, { roomID: id })
+}
+
+module.exports = { getExams, all, enroll, getEnrolleds, get, unroll, getRoomLessons, getLessons }

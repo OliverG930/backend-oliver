@@ -6,35 +6,35 @@ const config = require('../config')
 const CONNECTION_LOST = config.mysql.connection_lost
 
 const db_config = {
-    host: config.mysql.host,
-    user: config.mysql.user,
-    password: config.mysql.password,
-    database: config.mysql.db,
+  host: config.mysql.host,
+  user: config.mysql.user,
+  password: config.mysql.password,
+  database: config.mysql.db,
 }
 
 const conn = () => {
-    let connection = mysql.createConnection(db_config)
+  let connection = mysql.createConnection(db_config)
 
-    connection.connect((err) => {
-        if (err) {
-            console.log("[db:err] ", err)
-            setTimeout(conn, 2000)
-        } else {
-            console.log('[db] mysql connected!')
-        }
-    })
+  connection.connect((err) => {
+    if (err) {
+      console.log("[db:err] ", err)
+      setTimeout(conn, 2000)
+    } else {
+      console.log('[db] mysql connected!')
+    }
+  })
 
-    connection.on('error', err => {
-        if (err.code === CONNECTION_LOST) {
-            conn()
-        } else {
-            throw err
-        }
-    })
+  connection.on('error', err => {
+    if (err.code === CONNECTION_LOST) {
+      conn()
+    } else {
+      throw err
+    }
+  })
 
-    return connection
+  return connection
 }
 
 module.exports = {
-    conn
+  conn
 }

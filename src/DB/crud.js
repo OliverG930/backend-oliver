@@ -109,6 +109,41 @@ const deleteWhereID = (table, where) => {
     })
 }
 
+const insertOrUpdateUserImage = async (table, usuario_id, userimage) => {
+    return new Promise((_res, _rej) => {
+        // Paso 1: Obtener todos los valores actuales de los campos del usuario
+        const selectQuery = `SELECT * FROM ${table} WHERE usuario_id = ?`;
+
+        connection.query(selectQuery, [usuario_id], (err, result) => {
+            if (err) {
+                return _rej(err);
+            }
+
+            // Si no se encuentra el usuario
+            if (result.length === 0) {
+                return _rej(new Error("Usuario no encontrado"));
+            }
+
+            // Paso 2: Extraer los valores actuales de los campos
+            const userData = result[0];
+            const { nombre, apellido, correo, contrasenia, rol_id, ci, tel, userbackground, estado } = userData;
+
+            // Paso 3: Realizar la inserción o actualización solo del campo 'userimage'
+            const query = `
+                INSERT INTO ${table} (usuario_id, nombre, apellido, correo, contrasenia, rol_id, ci, tel, userimage, userbackground, estado)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE userimage = VALUES(userimage)
+            `;
+
+            // Realiza la inserción o actualización, manteniendo los campos no modificados
+            connection.query(query, [
+                usuario_id, nombre, apellido, correo, contrasenia, rol_id, ci, tel, userimage, userbackground, estado
+            ], (err, result) => {
+                return err ? _rej(err) : _res(result);
+            });
+        });
+    });
+}
 
 module.exports = {
     insert,
@@ -120,5 +155,6 @@ module.exports = {
     get,
     insertWhere,
     selectWithJoin,
-    getConnection
+    getConnection,
+    insertOrUpdateUserImage // Nueva función
 }

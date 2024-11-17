@@ -4,11 +4,14 @@ const resposes = require('../../red/responses')
 const controller = require("./controller")
 const multer = require("multer")
 const security = require('../../middlewares/security')
+const path = require('path');
+const fs = require('fs');
 //Multer es un "middleware" de node.js para el manejo de multipart/form-data, el cuál es usado sobre todo para la subida de archivos. Está escrito sobre busboy para maximizar su eficiencia.
 //https://github.com/expressjs/multer/blob/master/doc/README-es.md
 
 //configuracion de multer para subir en la carpeta de uploads los archivos
 //filename: guarda el archivo con el nombre original pero antes agrega un suffix unico
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './src/public/uploads')
@@ -25,7 +28,7 @@ const upload = multer({ storage: storage })
 router.post("/upload/:aula/:leccion", security(), upload.single("file"), async (req, res) => {
 
     const { file, user, params } = req
-    const aula_id = params.aula
+    const aula_id = params.aula_id
     const leccion_id = params.leccion
     const user_id = user.usuario_id
 

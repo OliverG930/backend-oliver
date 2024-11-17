@@ -1,8 +1,0 @@
-PORT=4000
-DB_HOST=localhost
-DB_USER=tcc
-DB_PASSWORD=''
-SECRET='seckret'
-DB=tcc
-SALT_ROUND=10
-API_KEY="you api HERE!"

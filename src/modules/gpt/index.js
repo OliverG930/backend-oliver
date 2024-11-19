@@ -181,7 +181,7 @@ router.post("/generate/exam", async (req, res) => {
   1. **Formato de Preguntas:**
       - Cada pregunta debe tener entre 3 y 4 opciones de respuesta si el tipo lo permite (por ejemplo, multiple_choice).
       - Solo una de las respuestas debe ser correcta.
-      - La pregunta debe estar en español, salvo que necesite ser en inglés (e.g., para evaluar vocabulario o gramática específicos).
+      - La pregunta debe estar en Inglés, salvo que necesite ser en Español (e.g., para evaluar vocabulario o gramática específicos).
       - Las respuestas incorrectas deben ser plausibles y adecuadas para el nivel ${level} para evitar que la respuesta correcta sea obvia.
 
   2. **Cobertura y Temática del Examen:**

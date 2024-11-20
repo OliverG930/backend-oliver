@@ -155,7 +155,9 @@ router.post("/gen/exam", async (req, res) => {
 
 router.post("/generate/exam", async (req, res) => {
 
-  const { amount, level, title, type } = req.body;
+  const { amount, level, title, type, keywords } = req.body;
+
+  console.log(keywords)
 
 
   if (!amount) {
@@ -243,6 +245,7 @@ router.post("/generate/exam", async (req, res) => {
   - Asegúrate de que todas las preguntas, respuestas y puntuación sigan las especificaciones indicadas.
   - Solo devuelve el JSON final generado, sin información adicional.
   - que sean preguntas relevantes para un examen de ingles.
+  - utiliza estas keywords para generar las preguntas: ${keywords}
 
 `;
   const completion = await openai.chat.completions.create({

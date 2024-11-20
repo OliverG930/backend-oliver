@@ -150,15 +150,11 @@ router.post('/save', async (req, res) => {
 
   const question = JSON.parse(body.value)
 
-
   const message = `
   Extrae 3 palabras claves según el contenido para el siguiente texto "${question.ask}" sea gramática o vocabulario solo responde un array con las palabras
   ejemplo: {
   "keywords": ["key1", "key2",...]
-}
-  
-  
-  `
+}`
 
   const completion = await openai.chat.completions.create({
     messages: [
@@ -174,20 +170,45 @@ router.post('/save', async (req, res) => {
     response_format: { type: "json_object" },
   })
 
-  console.log()
-
-
   //return responses.success(req, res, {}, 200)
   await controller.create({ ...body, keyword: completion.choices[0].message.content })
     .then(result => {
 
-      console.log(result)
       return responses.success(req, res, { message: messages.info_messages.LESSONS_CONTENTS_CREATED, result }, 200)
 
     }).catch((e) => {
-      console.log(e)
+      console.error(e.message)
 
       return responses.error(req, res, { message: e.message, e }, 200)
+    })
+
+})
+
+router.get('/keywords/:roomId', async (req, res) => {
+
+  const { roomId } = req.params
+
+  //obtener lecciones
+  await controller.getLessons({ room: roomId })
+    .then(async (result) => {
+      const myMap = await result.map((element) => element.id);
+      let contenidos = [];
+
+      for (const element of myMap) { // Usa for...of para manejar await correctamente
+        const contents = await controller.all(element); // Obtén los contenidos
+        const keywords = contents.map((content) => JSON.parse(content.keyword).keywords); // Extrae las palabras clave
+        contenidos = contenidos.concat(keywords); // Añade las keywords al array
+        //console.log(keywords); // Muestra las keywords de cada iteración
+      }
+      // Combina todos los contenidos en un string separado por comas
+      const contenidosString = contenidos.flat().join(', ');
+
+      console.log(contenidosString);
+      return responses.success(req, res, { keywords: contenidosString }, 201)
+    })
+    .catch((e) => {
+      console.error(e.message)
+      return responses.error(req, res, { error: e.message }, 201)
     })
 
 })

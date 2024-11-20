@@ -1,20 +1,25 @@
 const crud = require("../../../../DB/crud")
-const { LESSONS_CONTENT } = require("../../../../utils/tables")
+const { LESSONS_CONTENT, LESSONS } = require("../../../../utils/tables")
 
 function all(lesson) {
-    return crud.select(LESSONS_CONTENT, { lesson_id: lesson })
+  return crud.select(LESSONS_CONTENT, { lesson_id: lesson })
 }
 
 function create(data) {
-    return crud.insert(LESSONS_CONTENT, data)
+  return crud.insert(LESSONS_CONTENT, data)
 }
 
 function remove(content) {
-    return crud.deleteWhereID(LESSONS_CONTENT, { ID: content })
+  return crud.deleteWhereID(LESSONS_CONTENT, { ID: content })
+}
+
+function getLessons(data) {
+  return crud.select(LESSONS, data)
 }
 
 module.exports = {
-    all,
-    create,
-    remove
+  all,
+  create,
+  remove,
+  getLessons
 }

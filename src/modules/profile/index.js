@@ -23,7 +23,7 @@ const upload = multer({ storage });
 // Genera la ruta completa del archivo
 const getImagePath = (filename) => path.resolve(process.cwd(), `src/public/uploads/${filename}`);
 
-// Elimina el archivo si existe
+// Elimina el archivo si existe .... 
 const deleteFile = (filePath) => {
   if (fs.existsSync(filePath)) {
     fs.unlinkSync(filePath);

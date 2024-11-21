@@ -4,7 +4,7 @@ const TABLES = require("../../utils/tables");
 const fs = require("fs");
 const path = require("path");
 
-// --- Helper Functions ---
+// --- Helper Functions 1 ---
 const getImagePath = (filename) => {
   const uploadDir = process.env.IMAGE_UPLOAD_DIR || './src/public/uploads'; // Allow dynamic configuration
   return path.resolve(uploadDir, filename);

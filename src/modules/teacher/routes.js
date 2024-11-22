@@ -10,7 +10,7 @@ const security = require('../../middlewares/security')
 const responses = require('../../red/responses')
 
 router.get("/", security(), async (req, res, next) => {
-    return responses.success(req, res, { message: "hello Teacher!" }, 200)
+  return responses.success(req, res, { message: "hello Teacher!" }, 200)
 })
 
 router.use(rooms_router)
@@ -21,5 +21,3 @@ router.use("/reports", reportsRouter)
 router.use("/exams", examsRouter)
 
 module.exports = router
-
-

@@ -3,7 +3,6 @@ const router = express.Router()
 const responses = require('../../red/responses')
 const { writeFileSync } = require("node:fs")
 
-
 const OpenAI = require('openai');
 
 const openai = new OpenAI({ apiKey: process.env.API_KEY });
@@ -33,7 +32,6 @@ router.post('/resume', async (req, res) => {
 
   responses.success(req, res, { res: JSON.parse(completion.choices[0].message.content) }, 200)
 })
-
 
 router.post('/recommendations', async (req, res) => {
   const { body } = req
@@ -155,10 +153,7 @@ router.post("/gen/exam", async (req, res) => {
 
 router.post("/generate/exam", async (req, res) => {
 
-  const { amount, level, title, type, keywords } = req.body;
-
-  console.log(keywords)
-
+  const { amount, level, prompt, type, keywords } = req.body;
 
   if (!amount) {
     return responses.error(req, res, { message: "amount required" }, 500);
@@ -168,8 +163,8 @@ router.post("/generate/exam", async (req, res) => {
     return responses.error(req, res, { message: "level required" }, 500);
   }
 
-  if (!title) {
-    return responses.error(req, res, { message: "title required" }, 500);
+  if (!prompt) {
+    return responses.error(req, res, { message: "prompt required" }, 500);
   }
 
   if (!type) {
@@ -177,7 +172,7 @@ router.post("/generate/exam", async (req, res) => {
   }
 
   const message = `
-  Genera un conjunto de preguntas en formato JSON para un examen de inglés de nivel ${level}, con un total de ${amount} preguntas. Todas deben estar enfocadas en el tema "${title}" y seguir los criterios detallados a continuación.
+  Genera un conjunto de preguntas en formato JSON para un examen de inglés de nivel ${level}, con un total de ${amount} preguntas. Todas deben estar enfocadas en el tema "${prompt}" y seguir los criterios detallados a continuación.
 
   **Instrucciones Generales para la Creación de Preguntas:**
   1. **Formato de Preguntas:**
@@ -187,7 +182,7 @@ router.post("/generate/exam", async (req, res) => {
       - Las respuestas incorrectas deben ser plausibles y adecuadas para el nivel ${level} para evitar que la respuesta correcta sea obvia.
 
   2. **Cobertura y Temática del Examen:**
-      - Asegúrate de cubrir aspectos clave del tema "${title}" para evaluar una comprensión general y precisa de este contenido.
+      - Asegúrate de cubrir aspectos clave del tema "${prompt}" para evaluar una comprensión general y precisa de este contenido.
 
   3. **Estructura JSON de Cada Pregunta:**
       - Usa el formato JSON específico para el tipo de pregunta solicitado (${type}) y genera solo preguntas de este tipo.
@@ -303,7 +298,6 @@ router.post('/generate/:amount', async (req, res) => {
 
   responses.success(req, res, { res: JSON.parse(completion.choices[0].message.content) }, 200)
 })
-
 
 router.post("/gen/audio", async (req, res) => {
   // Generate an audio response to the given prompt

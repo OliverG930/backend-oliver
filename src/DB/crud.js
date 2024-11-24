@@ -22,6 +22,14 @@ const select = (table, data) => {
   })
 }
 
+const selectResume = (table, user_id, exam_id) => {
+  return new Promise((_res, _rej) => {
+    connection.query(`SELECT * FROM ${table} WHERE user_id = ? AND exam_id = ?`, [user_id, exam_id], (err, result) => {
+      return err ? _rej(err) : _res(result[0])
+    })
+  })
+}
+
 const selectWithJoin = (table_one, table_two, condition, where) => {
   return new Promise((_res, _rej) => {
 
@@ -115,5 +123,6 @@ module.exports = {
   get,
   insertWhere,
   selectWithJoin,
-  getConnection
+  getConnection,
+  selectResume
 }

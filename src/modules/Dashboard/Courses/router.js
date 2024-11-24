@@ -7,19 +7,19 @@ const security = require("../../../middlewares/security")
 
 
 router.get("/", security(), (req, res) => {
-    const { user } = req
-    responses.success(req, res, { message: `Hello ${user.nombre}`, user }, 200)
+  const { user } = req
+  responses.success(req, res, { message: `Hello ${user.nombre}` }, 200)
 })
 
 
 router.get("/:id", security(), async (req, res) => {
-    const { user, params } = req
+  const { user, params } = req
 
-    const { id } = params
+  const { id } = params
 
-    const result = await getCourseTasks(id);
+  const result = await getCourseTasks(id);
 
-    responses.success(req, res, { result }, 200)
+  responses.success(req, res, { result }, 200)
 })
 
 

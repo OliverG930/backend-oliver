@@ -8,5 +8,6 @@ module.exports = {
   COURSES_AULA: "courses.aula",
   TASKS: "tareas",
   EXAMS: "exams",
+  EXAMS_USERS: "exams_users",
   USUARIOS: "usuarios",
 }

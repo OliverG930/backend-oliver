@@ -1,12 +1,12 @@
-const auth = require("../auth")
+const auth = require('../auth')
 
 const security = () => {
-    const middleware = (req, res, next) => {
-        auth.checkToken.confirmToken(req)
-        next()
-    }
+  const middleware = (req, _, next) => {
+    auth.checkToken.confirmToken(req)
+    next()
+  }
 
-    return middleware
+  return middleware
 }
 
 module.exports = security

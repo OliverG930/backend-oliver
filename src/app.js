@@ -1,5 +1,5 @@
 const express = require('express')
-const path = require("path")
+const path = require('path')
 const morgan = require('morgan')
 const config = require('./config')
 const cors = require('cors')
@@ -11,48 +11,46 @@ const authRouter = require('./modules/auth')
 const filesRouter = require('./modules/files')
 const gptRouter = require('./modules/gpt')
 const dashRouter = require('./modules/Dashboard')
-const pdfRouter = require("./modules/pdf")
-const filesToChatgptRouter = require("./modules/files-to-gpt")
+const pdfRouter = require('./modules/pdf')
+const filesToChatgptRouter = require('./modules/files-to-gpt')
 const errors = require('./red/errors')
-const profileRouter = require('./modules/profile/index') //para el profile
+const profileRouter = require('./modules/profile/index') // para el profile
 
-//create ap with express
-//DOC: https://expressjs.com/
+// create ap with express
+// DOC: https://expressjs.com/
 const app = express()
 
-//middleware
+// middleware
 
-//morgan https://github.com/expressjs/morgan
+// morgan https://github.com/expressjs/morgan
 app.use(morgan('tiny'))
-//app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
-//app.use(morgan('dev'))
+// app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
+// app.use(morgan('dev'))
 app.use(express.json())
 
-//configurations
+// configurations
 app.set('port', config.app.port)
 
-//CORS is a node.js package for providing a Connect/Express middleware that can be used to enable CORS with various options. DOC: https://www.npmjs.com/package/cors
+// CORS is a node.js package for providing a Connect/Express middleware that can be used to enable CORS with various options. DOC: https://www.npmjs.com/package/cors
 app.use(cors())
 
 app.use(express.static(path.join(__dirname, 'public')))
-    .set('views', path.join(__dirname, 'views'))
-    .set('view engine', 'ejs');
+  .set('views', path.join(__dirname, 'views'))
+  .set('view engine', 'ejs')
 
 app.get('/docs', (req, res) => {
-    res.render('index', {
-        host: req.headers.host
-    });
-});
+  res.render('index', {
+    host: req.headers.host
+  })
+})
 
 app.get('/docs/lessons', (req, res) => {
-    res.render('teacher/lessons', {
-        host: req.headers.host
-    });
-});
+  res.render('teacher/lessons', {
+    host: req.headers.host
+  })
+})
 
-
-
-//routes api
+// routes api
 app.use('/api/clients', clientsRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/register', registerRouter)
@@ -63,7 +61,7 @@ app.use('/api/gpt', gptRouter)
 app.use('/api/dashboard', dashRouter)
 app.use('/api/pdf', pdfRouter)
 app.use('/api/files-to-chatgpt', filesToChatgptRouter)
-app.use('/profile', profileRouter) //para el profile
+app.use('/profile', profileRouter) // para el profile
 
 app.use(errors)
 

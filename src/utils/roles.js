@@ -1,5 +1,5 @@
 module.exports = {
-    ROLES: {
-        TEACHER: 2
-    }
+  ROLES: {
+    TEACHER: 2
+  }
 }

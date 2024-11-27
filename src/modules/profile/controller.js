@@ -1,106 +1,52 @@
+/* eslint-disable camelcase */
+const db = require('../../DB/crud')
+const tables = require('../../utils/tables')
+const multer = require('multer')
+const path = require('path')
+const responses = require('../../red/responses')
 
-const db = require("../../DB/crud");
-const TABLES = require("../../utils/tables");
-const fs = require("fs");
-const path = require("path");
+// Configuración de multer
+const storage = multer.diskStorage({
+  destination: path.resolve(process.cwd(), 'src/public/uploads'),
+  filename: (_, file, cb) => {
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}-${file.originalname}`
+    cb(null, uniqueSuffix)
+  }
+})
 
-// --- Helper Functions 1 ---
-const getImagePath = (filename) => {
-  const uploadDir = process.env.IMAGE_UPLOAD_DIR || './src/public/uploads'; // Allow dynamic configuration
-  return path.resolve(uploadDir, filename);
-};
+const uploadController = multer({ storage })
 
-const deleteFileIfExists = (filePath) => {
-  try {
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+async function updateProfileImages (req, res) {
+  const { update } = req.params
+  const { usuario_id } = req.user
+  const { filename } = req.file
+  let data = {}
+
+  if (update === 'bg') {
+    data = { userbackground: filename }
+  }
+
+  if (update === 'pic') {
+    data = { userimage: filename }
+  }
+
+  console.log(update, usuario_id, filename)
+  if (data !== null) {
+    try {
+      await db.update(tables.USUARIOS, data, { usuario_id })
+        .then(response => {
+          console.log(response)
+          return responses.success(req, res, { message: 'updated', filename }, 200)
+        })
+    } catch (err) {
+      return responses.error(req, res, { message: err.message }, 500)
     }
-  } catch (error) {
-    console.error("Error deleting file:", error.message); // Log error but continue execution
+  } else {
+    return responses.error(req, res, { message: 'cant update' }, 404)
   }
-};
-
-// --- User Image (Profile) ---
-const saveUserImage = async (usuario_id, userimage) => {
-  try {
-    return await db.insertOrUpdateUserImage(TABLES.USUARIOS, usuario_id, userimage);
-  } catch (error) {
-    throw new Error("Error saving user image: " + error.message);
-  }
-};
-
-const getUserImageById = async (usuario_id) => {
-  const result = await db.selectOneWhere(TABLES.USUARIOS, { usuario_id });
-  if (result && result.userimage) {
-    return result.userimage; // Return only the profile image
-  }
-  return null; // Return null instead of throwing error if image not found
-};
-
-const updateUserImageById = async (usuario_id, userimage) => {
-  try {
-    return await db.update(TABLES.USUARIOS, { userimage }, { usuario_id });
-  } catch (error) {
-    throw new Error("Error updating user image: " + error.message);
-  }
-};
-
-const deleteUserImage = async (usuario_id) => {
-  try {
-    const userImage = await getUserImageById(usuario_id);
-    if (userImage) {
-      deleteFileIfExists(getImagePath(userImage));
-    }
-    return await db.delete(TABLES.USUARIOS, { usuario_id });
-  } catch (error) {
-    throw new Error("Error deleting user image: " + error.message);
-  }
-};
-
-// --- User Background (Background Image) ---
-const saveUserBackground = async (usuario_id, userbackground) => {
-  try {
-    return await db.insertOrUpdateUserBackground(TABLES.USUARIOS, usuario_id, userbackground);
-  } catch (error) {
-    throw new Error("Error saving user background: " + error.message);
-  }
-};
-
-const getUserBackgroundById = async (usuario_id) => {
-  const result = await db.selectOneWhere(TABLES.USUARIOS, { usuario_id });
-  if (result && result.userbackground) {
-    return result.userbackground; // Return only the background image
-  }
-  return null; // Return null instead of throwing error if background not found
-};
-
-const updateUserBackgroundById = async (usuario_id, userbackground) => {
-  try {
-    return await db.update(TABLES.USUARIOS, { userbackground }, { usuario_id });
-  } catch (error) {
-    throw new Error("Error updating user background: " + error.message);
-  }
-};
-
-const deleteUserBackground = async (usuario_id) => {
-  try {
-    const userBackground = await getUserBackgroundById(usuario_id);
-    if (userBackground) {
-      deleteFileIfExists(getImagePath(userBackground));
-    }
-    return await db.delete(TABLES.USUARIOS, { usuario_id });
-  } catch (error) {
-    throw new Error("Error deleting user background: " + error.message);
-  }
-};
+}
 
 module.exports = {
-  saveUserImage,
-  getUserImageById,
-  updateUserImageById,
-  deleteUserImage,
-  saveUserBackground,
-  getUserBackgroundById,
-  updateUserBackgroundById,
-  deleteUserBackground,
-};
+  updateProfileImages,
+  uploadController
+}

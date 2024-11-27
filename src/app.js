@@ -34,6 +34,8 @@ app.set('port', config.app.port)
 // CORS is a node.js package for providing a Connect/Express middleware that can be used to enable CORS with various options. DOC: https://www.npmjs.com/package/cors
 app.use(cors())
 
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')))
+
 app.use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
@@ -62,6 +64,7 @@ app.use('/api/dashboard', dashRouter)
 app.use('/api/pdf', pdfRouter)
 app.use('/api/files-to-chatgpt', filesToChatgptRouter)
 app.use('/profile', profileRouter) // para el profile
+app.use('/api/profile', profileRouter) // para el profile
 
 app.use(errors)
 

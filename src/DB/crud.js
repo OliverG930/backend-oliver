@@ -7,71 +7,71 @@ function getConnection () {
 
 // selecciona de la tabla el primer dato de la consulta recibido desde el  parametro data con este formato {id_usuario: 1}
 const selectOneWhere = (table, data) => {
-  return new Promise((_res, _rej) => {
+  return new Promise((resolve, reject) => {
     connection.query(`SELECT * FROM ${table} WHERE ?`, data, (err, result) => {
-      return err ? _rej(err) : _res(result[0])
+      return err ? reject(err) : resolve(result[0])
     })
   })
 }
 
 const select = (table, data) => {
-  return new Promise((_res, _rej) => {
+  return new Promise((resolve, reject) => {
     connection.query(`SELECT * FROM ${table} WHERE ?`, data, (err, result) => {
-      return err ? _rej(err) : _res(result)
+      return err ? reject(err) : resolve(result)
     })
   })
 }
 
-const selectResume = (table, user_id, exam_id) => {
-  return new Promise((_res, _rej) => {
-    connection.query(`SELECT * FROM ${table} WHERE user_id = ? AND exam_id = ?`, [user_id, exam_id], (err, result) => {
-      return err ? _rej(err) : _res(result[0])
+const selectResume = (table, userId, examId) => {
+  return new Promise((resolve, reject) => {
+    connection.query(`SELECT * FROM ${table} WHERE user_id = ? AND exam_id = ?`, [userId, examId], (err, result) => {
+      return err ? reject(err) : resolve(result[0])
     })
   })
 }
 
-const selectWithJoin = (table_one, table_two, condition, where) => {
-  return new Promise((_res, _rej) => {
+const selectWithJoin = (tableOne, tableTwo, condition, where) => {
+  return new Promise((resolve, reject) => {
     const query = `
-            SELECT * FROM ${table_one}
-            JOIN ${table_two} ON ${condition}
+            SELECT * FROM ${tableOne}
+            JOIN ${tableTwo} ON ${condition}
             WHERE ${Object.keys(where).map(key => `${key} = ?`).join(' AND ')}
         `
     // Extraer los valores de la condición WHERE
     const values = Object.values(where)
     connection.query(query, values, (err, result) => {
-      return err ? _rej(err) : _res(result)
+      return err ? reject(err) : resolve(result)
     })
   })
 }
 
 const selectAll = (table) => {
-  return new Promise((_res, _rej) => {
+  return new Promise((resolve, reject) => {
     connection.query(`select * from ${table}`, (err, result) => {
-      return err ? _rej(err) : _res(result[0])
+      return err ? reject(err) : resolve(result[0])
     })
   })
 }
 
 const get = (table) => {
-  return new Promise((_res, _rej) => {
+  return new Promise((resolve, reject) => {
     connection.query(`select * from ${table}`, (err, result) => {
-      return err ? _rej(err) : _res(result)
+      return err ? reject(err) : resolve(result)
     })
   })
 }
 
 // inserta en la tabla 'table' los datos recibidos desde el  parametro data con este formato {id_usuario: 1, nombre: 'Marcos', id_rol: 1}
 const insert = (table, data) => {
-  return new Promise((_res, _rej) => {
+  return new Promise((resolve, reject) => {
     connection.query(`INSERT INTO ${table} SET ?`, data, (err, result) => {
-      return err ? _rej(err) : _res(result)
+      return err ? reject(err) : resolve(result)
     })
   })
 }
 
 const insertWhere = (table, data, where) => {
-  // Construir la parte de la consulta WHERE dinámicamente
+  // Construir la parte de la consulta WHERE dinámica
   const conditions = Object.keys(where).map(key => `${key} = ?`).join(' AND ')
   const values = Object.values(where)
 

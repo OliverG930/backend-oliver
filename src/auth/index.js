@@ -4,7 +4,7 @@ const error = require('../middlewares/errors')
 
 const secret = config.jwt.secret
 
-const asignToken = (data) => {
+const assignToken = (data) => {
   return jwt.sign(data, secret)
 }
 
@@ -14,7 +14,7 @@ const verifyToken = (token) => {
 
 const checkToken = {
   confirmToken: (req) => {
-    const decode = decodeHeader(req)
+    decodeHeader(req)
   }
 }
 
@@ -43,6 +43,6 @@ const decodeHeader = (req) => {
 }
 
 module.exports = {
-  asignToken,
+  assignToken,
   checkToken
 }

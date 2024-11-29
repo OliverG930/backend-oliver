@@ -1,40 +1,35 @@
-const express = require("express")
+const express = require('express')
 const router = express.Router()
-const responses = require("../../../red/responses")
-const { getContents, getLessonContent, getCourses, getCourse, getAllCourses, enrollCourse, getAll, enroll, unroll, getLessons, getRoomLessons, getExams } = require("./controller")
+const responses = require('../../../red/responses')
+const { getContents, getMyExams, getLessonContent, getCourses, getCourse, getAllCourses, enrollCourse, enroll, unroll, getLessons, getRoomLessons, getExams } = require('./controller')
 
-const security = require("../../../middlewares/security")
+const security = require('../../../middlewares/security')
 
+// router.get("/:id:", security(), getAll) // obsoleto cambiar en front antes de borrar
 
-//router.get("/:id:", security(), getAll) // obsoleto cambiar en front antes de borrar
+router.get('/', security(), getAllCourses)
 
-router.get("/", security(), getAllCourses)
+router.get('/courses', security(), getCourses)
 
-router.get("/courses", security(), getCourses)
+router.get('/courses/:id', security(), getCourse)
 
-router.get("/courses/:id", security(), getCourse)
+router.get('/courses/enroll/:id', security(), enrollCourse)
 
-router.get("/courses/enroll/:id", security(), enrollCourse)
+router.get('/courses/:id/lessons', security(), getLessons)
 
-router.get("/courses/:id/lessons", security(), getLessons)
+router.get('/lessons/:id', security(), getLessonContent)
 
-router.get("/lessons/:id", security(), getLessonContent)
-
-router.get("/courses/lessons/:id/contents", security(), getContents)
-
-
+router.get('/courses/lessons/:id/contents', security(), getContents)
+router.get('/:roomId/myExams', security(), getMyExams)
 
 // antiguos
-router.get("/enrolled", security(), async (req, res, next) => {
-
+router.get('/enrolled', security(), async (req, res, next) => {
   const { user } = req
 
-
-  responses.success(req, res, { message: `Hola `, user }, 200)
+  responses.success(req, res, { message: 'Hola ', user }, 200)
 })
 
-router.post("/enroll", security(), async (req, res, next) => {
-
+router.post('/enroll', security(), async (req, res, next) => {
   const insert = enroll(req.body)
 
   insert.then(response => {
@@ -46,9 +41,7 @@ router.post("/enroll", security(), async (req, res, next) => {
   })
 })
 
-
-router.post("/unroll/:id", security(), async (req, res, next) => {
-
+router.post('/unroll/:id', security(), async (req, res, next) => {
   const { id } = req.params
 
   const insert = unroll(id)
@@ -62,17 +55,15 @@ router.post("/unroll/:id", security(), async (req, res, next) => {
   })
 })
 
-
-router.get("/:id/lessons", async (req, res) => {
+router.get('/:id/lessons', async (req, res) => {
   const { id } = req.params
   const result = await getRoomLessons(id)
   responses.success(req, res, { message: id, result }, 200)
 })
 
-router.get("/lessons/:id", async (req, res) => {
+router.get('/lessons/:id', async (req, res) => {
   const { id } = req.params
   try {
-
     const result = await getLessons(id)
     return responses.success(req, res, { message: id, result }, 200)
   } catch (e) {
@@ -81,15 +72,13 @@ router.get("/lessons/:id", async (req, res) => {
   }
 })
 
-
-router.get("/:id/exams", security(), async (req, res) => {
-
-  const { params, user } = req
+router.get('/:id/exams', security(), async (req, res) => {
+  const { params } = req
   const id = params.id
 
   const examsResult = await getExams(id)
 
-  responses.success(req, res, { message: "hello", exams: examsResult }, 200)
+  responses.success(req, res, { message: 'hello', exams: examsResult }, 200)
 })
 
 module.exports = router

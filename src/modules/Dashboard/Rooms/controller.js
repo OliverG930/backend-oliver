@@ -137,4 +137,37 @@ const getMyExams = async (req, res) => {
   // return db.select(TABLES.EXAMS_USERS)
 }
 
-module.exports = { getMyExams, getLessons, getLessonContent, getCourses, getCourse, getAllCourses, enrollCourse, getAll, all, getExams, enroll, getEnrolled, get, unroll, getRoomLessons, getContents }
+const getTasks = async (req, res) => {
+  const { roomId } = req.params
+  // const { user } = req
+  console.log(roomId)
+  const result = await db.select(tables.TASKS, { id_room: roomId })
+  return responses.success(req, res, result, 200)
+}
+
+const createTask = async (req, res) => {
+  const { roomId } = req.params
+
+  const data = {
+    title: req.body.title,
+    desc: req.body.desc,
+    expired_at: req.body.expired_at,
+    id_room: Number(roomId)
+  }
+
+  const save = await db.insert(tables.TASKS, data)
+
+  return responses.success(req, res, save, 200)
+}
+
+const deleteTask = async (req, res) => {
+  const { taskId } = req.params
+
+  try {
+    const save = await db.deleteWhereID(tables.TASKS, { id: taskId })
+    return responses.success(req, res, save, 200)
+  } catch (err) {
+    return responses.error(req, res, { message: 'error' }, 500)
+  }
+}
+module.exports = { deleteTask, createTask, getTasks, getMyExams, getLessons, getLessonContent, getCourses, getCourse, getAllCourses, enrollCourse, getAll, all, getExams, enroll, getEnrolled, get, unroll, getRoomLessons, getContents }

@@ -1,14 +1,12 @@
-const TABLES = require("../../../utils/tables")
+const TABLES = require('../../../utils/tables')
 
-const crud = require("../../../DB/crud")
+const crud = require('../../../DB/crud')
 
-function addNewTask(id) {
-
-    return crud.insert(TABLES.TASKS, { id_aula_virtual: id })
-
+function addNewTask (id) {
+  return crud.insert(TABLES.TASKS, { id_aula_virtual: id })
 }
 
-function deleteTask(id) {
+function deleteTask (id) {
 
 }
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
 const router = express.Router(); // Creando el router de Express
-
+// es opcional
 // Función que maneja la lógica para obtener aulas y estudiantes
 const getAulasAndStudents = async (req, res) => {
     const { id_aula, ne, PRN } = req.query;

@@ -15,7 +15,7 @@ const pdfRouter = require('./modules/pdf')
 const filesToChatgptRouter = require('./modules/files-to-gpt')
 const errors = require('./red/errors')
 const profileRouter = require('./modules/profile/index') // para el profile
-
+const reportRouter = require('./modules/teacher/reports')
 // create ap with express
 // DOC: https://expressjs.com/
 const app = express()
@@ -65,7 +65,7 @@ app.use('/api/pdf', pdfRouter)
 app.use('/api/files-to-chatgpt', filesToChatgptRouter)
 app.use('/profile', profileRouter) // para el profile
 app.use('/api/profile', profileRouter) // para el profile
-
+app.use('/api', reportRouter)
 app.use(errors)
 
 module.exports = app

@@ -22,6 +22,7 @@ const login = async (body) => {
       const user = {
         id: data.usuario_id,
         name: data.nombre,
+        lastName: data.apellido,
         email: data.correo,
         type: data.rol_id,
         pic: data.userimage,

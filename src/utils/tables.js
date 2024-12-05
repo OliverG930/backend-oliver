@@ -9,5 +9,6 @@ module.exports = {
   TASKS: 'tareas',
   EXAMS: 'exams',
   EXAMS_USERS: 'exams_users',
-  USUARIOS: 'usuarios'
+  USUARIOS: 'usuarios',
+  COMMENTS: 'comentarios'
 }

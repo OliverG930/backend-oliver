@@ -1,6 +1,9 @@
 /* eslint-disable camelcase */
 const PDFDocument = require('pdfkit')
-const { getConnection } = require('../../../DB/crud')
+const { getConnection, select } = require('../../../DB/crud')
+const { saveComment, updateComment } = require('./comentario')
+const responses = require('../../../red/responses')
+const tables = require('../../../utils/tables')
 
 async function generateReport (req, res) {
   const { nombre, apellido } = req.user
@@ -46,7 +49,8 @@ async function generateReport (req, res) {
                 AND av.aula_id = ?`
 
   try {
-    getConnection().query(query, [ne, `${nombre} ${apellido}`, id_aula], (_err, rows) => {
+    getConnection().query(query, [ne, `${nombre} ${apellido}`, id_aula], (err, rows) => {
+      console.log(err)
       if (rows.length === 0) {
         return res.status(404).json({ error: 'No se encontraron datos para el reporte.' })
       }
@@ -112,4 +116,65 @@ async function generateReport (req, res) {
   }
 }
 
-module.exports = { generateReport }
+async function addCommentController (req, res) {
+  try {
+    const { user_id, room } = req.params
+
+    // Combina los parámetros de la URL con el cuerpo de la solicitud
+    const data = {
+      ...req.body, // los datos del cuerpo de la solicitud
+      user_id, // agrega el user_id desde la URL
+      room // agrega el room desde la URL
+    }
+
+    // console.log(data)
+    // return res.status(200).json({})
+
+    // Llama al controlador para guardar el comentario
+    const result = await saveComment(data)
+
+    // Responde según el resultado
+    return responses.success(req, res, { com_id: result.insertId, user_id: Number(user_id), room: Number(room), ...req.body })
+  } catch (error) {
+    console.error('Error al procesar la solicitud:', error.message)
+    return res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    })
+  }
+}
+
+async function updateCommentController (req, res) {
+  try {
+    const { userId } = req.params
+
+    // Combina los parámetros de la URL con el cuerpo de la solicitud
+    const data = {
+      ...req.body, // los datos del cuerpo de la solicitud
+      userId
+    }
+
+    // Llama al controlador para actualizar el comentario
+    const result = await updateComment(data)
+
+    // Responde según el resultado
+    return responses.success(req, res, { message: 'success', result }, 200)
+  } catch (error) {
+    console.error('Error al procesar la solicitud:', error.message)
+    return responses.success(req, res, { message: 'Error interno del servidor' }, 404)
+  }
+}
+
+async function getUserComment (req, res) {
+  const { userId } = req.params
+
+  try {
+    const comments = await select(tables.COMMENTS, { user_id: userId })
+
+    return responses.success(req, res, comments, 200)
+  } catch (error) {
+    return responses.error(req, res, { message: 'error al obtener comentarios' }, 500)
+  }
+}
+module.exports = { getUserComment, generateReport, addCommentController, updateCommentController }

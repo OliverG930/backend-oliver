@@ -1,11 +1,11 @@
 const express = require('express')
 const router = express.Router()
 const responses = require('../../red/responses')
-const { writeFileSync } = require("node:fs")
+const { writeFileSync } = require('node:fs')
 
-const OpenAI = require('openai');
+const OpenAI = require('openai')
 
-const openai = new OpenAI({ apiKey: process.env.API_KEY });
+const openai = new OpenAI({ apiKey: process.env.API_KEY })
 
 router.post('/resume', async (req, res) => {
   const { body } = req
@@ -19,15 +19,15 @@ router.post('/resume', async (req, res) => {
   const completion = await openai.chat.completions.create({
     messages: [
       {
-        role: "system",
-        content: "You are a helpful English teacher designed to produce JSON.",
+        role: 'system',
+        content: 'You are a helpful English teacher designed to produce JSON.'
       },
       {
-        role: "user", content: messageRes
-      },
+        role: 'user', content: messageRes
+      }
     ],
-    model: "gpt-4o",
-    response_format: { type: "json_object" },
+    model: 'gpt-4o',
+    response_format: { type: 'json_object' }
   })
 
   responses.success(req, res, { res: JSON.parse(completion.choices[0].message.content) }, 200)
@@ -50,15 +50,15 @@ ${JSON.stringify(body)}
   const completion = await openai.chat.completions.create({
     messages: [
       {
-        role: "system",
-        content: "You are a helpful teacher designed to output JSON.",
+        role: 'system',
+        content: 'You are a helpful teacher designed to output JSON.'
       },
       {
-        role: "user", content: messageRes
-      },
+        role: 'user', content: messageRes
+      }
     ],
-    model: "gpt-4o",
-    response_format: { type: "json_object" },
+    model: 'gpt-4o',
+    response_format: { type: 'json_object' }
   })
 
   console.log(messageRes)
@@ -66,20 +66,19 @@ ${JSON.stringify(body)}
   responses.success(req, res, { res: JSON.parse(completion.choices[0].message.content) }, 200)
 })
 
-router.post("/gen/exam", async (req, res) => {
-
-  const { amount, level, title } = req.body;
+router.post('/gen/exam', async (req, res) => {
+  const { amount, level, title } = req.body
 
   if (!amount) {
-    responses.error(req, res, { message: "amount required" }, 500);
+    responses.error(req, res, { message: 'amount required' }, 500)
   }
 
   if (!level) {
-    responses.error(req, res, { message: "level required" }, 500);
+    responses.error(req, res, { message: 'level required' }, 500)
   }
 
   if (!title) {
-    responses.error(req, res, { message: "title required" }, 500);
+    responses.error(req, res, { message: 'title required' }, 500)
   }
 
   const message = `
@@ -130,45 +129,42 @@ router.post("/gen/exam", async (req, res) => {
   - Los puntos estén bien distribuidos y reflejen la dificultad de la pregunta (generalmente 1-2 puntos).
   - Las respuestas incorrectas tengan sentido y sean razonablemente plausibles para evitar que las respuestas correctas sean demasiado obvias.
 
-        `;
+        `
 
   const completion = await openai.chat.completions.create({
     messages: [
       {
-        role: "system",
-        content: "You are a helpful English teacher designed to produce JSON.",
+        role: 'system',
+        content: 'You are a helpful English teacher designed to produce JSON.'
       },
       {
-        role: "user", content: message
-      },
+        role: 'user', content: message
+      }
     ],
-    model: "gpt-4o",
-    response_format: { type: "json_object" },
+    model: 'gpt-4o',
+    response_format: { type: 'json_object' }
   })
 
+  responses.success(req, res, JSON.parse(completion.choices[0].message.content), 200)
+})
 
-  responses.success(req, res, JSON.parse(completion.choices[0].message.content), 200);
-
-});
-
-router.post("/generate/exam", async (req, res) => {
-
-  const { amount, level, prompt, type, keywords } = req.body;
+router.post('/generate/exam', async (req, res) => {
+  const { amount, level, prompt, type, keywords } = req.body
 
   if (!amount) {
-    return responses.error(req, res, { message: "amount required" }, 500);
+    return responses.error(req, res, { message: 'amount required' }, 500)
   }
 
   if (!level) {
-    return responses.error(req, res, { message: "level required" }, 500);
+    return responses.error(req, res, { message: 'level required' }, 500)
   }
 
   if (!prompt) {
-    return responses.error(req, res, { message: "prompt required" }, 500);
+    return responses.error(req, res, { message: 'prompt required' }, 500)
   }
 
   if (!type) {
-    return responses.error(req, res, { message: "type required" }, 500);
+    return responses.error(req, res, { message: 'type required' }, 500)
   }
 
   const message = `
@@ -242,30 +238,28 @@ router.post("/generate/exam", async (req, res) => {
   - que sean preguntas relevantes para un examen de ingles.
   - utiliza estas keywords para generar las preguntas: ${keywords}
 
-`;
+`
   const completion = await openai.chat.completions.create({
     messages: [
       {
-        role: "system",
-        content: "You are a helpful English teacher designed to produce JSON.",
+        role: 'system',
+        content: 'You are a helpful English teacher designed to produce JSON.'
       },
       {
-        role: "user", content: message
-      },
+        role: 'user', content: message
+      }
     ],
-    model: "gpt-4o",
-    response_format: { type: "json_object" },
+    model: 'gpt-4o',
+    response_format: { type: 'json_object' }
   })
 
-  responses.success(req, res, JSON.parse(completion.choices[0].message.content), 200);
-
-});
+  responses.success(req, res, JSON.parse(completion.choices[0].message.content), 200)
+})
 
 router.post('/generate/:amount', async (req, res) => {
   const { body, params } = req
 
   const cantidad = parseInt(params.amount) || 10
-
 
   const messageRes = `crea ${cantidad} ejercicios para afianzar el aprendizaje del ingles, siguiendo los siguientes puntos
         1. Responde solo el JSON nada mas.
@@ -280,52 +274,50 @@ router.post('/generate/:amount', async (req, res) => {
 
         ${body}
 
-        `;
+        `
 
   const completion = await openai.chat.completions.create({
     messages: [
       {
-        role: "system",
-        content: "You are a helpful teacher designed to output JSON.",
+        role: 'system',
+        content: 'You are a helpful teacher designed to output JSON.'
       },
       {
-        role: "user", content: messageRes
-      },
+        role: 'user', content: messageRes
+      }
     ],
-    model: "gpt-4o",
-    response_format: { type: "json_object" },
+    model: 'gpt-4o',
+    response_format: { type: 'json_object' }
   })
 
   responses.success(req, res, { res: JSON.parse(completion.choices[0].message.content) }, 200)
 })
 
-router.post("/gen/audio", async (req, res) => {
+router.post('/gen/audio', async (req, res) => {
   // Generate an audio response to the given prompt
   const response = await openai.chat.completions.create({
-    model: "gpt-4o-audio-preview",
-    modalities: ["text", "audio"],
-    audio: { voice: "alloy", format: "mp3" },
+    model: 'gpt-4o-audio-preview',
+    modalities: ['text', 'audio'],
+    audio: { voice: 'alloy', format: 'mp3' },
     messages: [
       {
-        role: "user",
-        content: "La capital de Australia?"
+        role: 'user',
+        content: 'La capital de Australia?'
       }
     ]
-  });
+  })
 
   // Write audio data to a file
   writeFileSync(
-    "dog.wav",
+    'dog.wav',
     Buffer.from(response.choices[0].message.audio.data, 'base64'),
-    { encoding: "utf-8" }
-  );
+    { encoding: 'utf-8' }
+  )
 
-  responses.success(req, res, response.choices[0].message.audio.transcript, 200);
+  responses.success(req, res, response.choices[0].message.audio.transcript, 200)
 })
 
-router.post("/exam/analice", async (req, res) => {
-
-
+router.post('/exam/analice', async (req, res) => {
   const { body } = req
 
   const examen = body
@@ -353,15 +345,15 @@ router.post("/exam/analice", async (req, res) => {
   const completion = await openai.chat.completions.create({
     messages: [
       {
-        role: "system",
-        content: "You are a helpful English teacher designed to produce JSON.",
+        role: 'system',
+        content: 'You are a helpful English teacher designed to produce JSON.'
       },
       {
-        role: "user", content: messageRes
-      },
+        role: 'user', content: messageRes
+      }
     ],
-    model: "gpt-4o",
-    response_format: { type: "json_object" },
+    model: 'gpt-4o',
+    response_format: { type: 'json_object' }
   })
 
   // console.log(JSON.stringify(examen))

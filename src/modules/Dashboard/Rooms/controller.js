@@ -155,9 +155,13 @@ const createTask = async (req, res) => {
     id_room: Number(roomId)
   }
 
-  const save = await db.insert(tables.TASKS, data)
-
-  return responses.success(req, res, save, 200)
+  try {
+    const save = await db.insert(tables.TASKS, data)
+    return responses.success(req, res, save, 200)
+  } catch (error) {
+    console.log(error.message)
+    return responses.success(req, res, { message: 'error al guardar' }, 200)
+  }
 }
 
 const deleteTask = async (req, res) => {

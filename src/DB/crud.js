@@ -22,6 +22,17 @@ const select = (table, data) => {
   })
 }
 
+const selectMultipleWheres = (table, multipleWheres = {}) => {
+  const inWhere = Object.keys(multipleWheres).map(key => `${key} = ?`).join(' AND ')
+  const values = Object.values(multipleWheres)
+
+  return new Promise((resolve, reject) => {
+    connection.query(`SELECT * FROM ${table} WHERE ${inWhere}`, values, (err, result) => {
+      return err ? reject(err) : resolve(result)
+    })
+  })
+}
+
 const selectResume = (table, userId, examId) => {
   return new Promise((resolve, reject) => {
     connection.query(`SELECT * FROM ${table} WHERE user_id = ? AND exam_id = ?`, [userId, examId], (err, result) => {
@@ -96,6 +107,61 @@ const insertWhere = (table, data, where) => {
   })
 }
 
+const insertWhereV2 = async (table, data, where) => {
+  if (!table || typeof table !== 'string') {
+    throw new Error('Invalid table name')
+  }
+  if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+    throw new Error('Invalid data object')
+  }
+  if (!where || typeof where !== 'object' || Object.keys(where).length === 0) {
+    throw new Error('Invalid where conditions')
+  }
+
+  // Construir la parte dinámica de la consulta WHERE
+  const whereConditions = Object.keys(where)
+    .map(key => `${key} = ?`)
+    .join(' AND ')
+  const whereValues = Object.values(where)
+
+  // Construir la consulta con INSERT ... SELECT
+  const keys = Object.keys(data).join(', ')
+  const placeholders = Object.keys(data)
+    .map(() => '?')
+    .join(', ')
+  const values = Object.values(data)
+
+  const query = `
+    INSERT INTO ?? (${keys})
+    SELECT ${placeholders}
+    WHERE NOT EXISTS (
+      SELECT 1 FROM ?? WHERE ${whereConditions}
+    );
+  `
+
+  try {
+    // Ejecutar la consulta
+    const result = await queryAsync(query, [table, ...values, table, ...whereValues])
+    return result.affectedRows > 0
+      ? { message: 'Data inserted successfully' }
+      : { message: 'Data already exists' }
+  } catch (error) {
+    throw new Error(`Database operation failed: ${error.message}`)
+  }
+}
+
+// Función auxiliar para consultas asincrónicas
+const queryAsync = (query, params) => {
+  return new Promise((resolve, reject) => {
+    connection.query(query, params, (err, results) => {
+      if (err) {
+        return reject(err)
+      }
+      resolve(results)
+    })
+  })
+}
+
 const update = async (table, data, where) => {
   return new Promise((resolve, reject) => {
     connection.query(`UPDATE ${table} SET ? WHERE ?`, [data, where], (err, result) => {
@@ -121,7 +187,9 @@ module.exports = {
   selectAll,
   get,
   insertWhere,
+  insertWhereV2,
   selectWithJoin,
   getConnection,
-  selectResume
+  selectResume,
+  selectMultipleWheres
 }

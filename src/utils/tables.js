@@ -7,6 +7,8 @@ module.exports = {
   COURSES: 'courses',
   COURSES_AULA: 'courses.aula',
   TASKS: 'tareas',
+  TASKS_CONTENT: 'tareas_content',
+  TASKS_USERS: 'tareas_users',
   EXAMS: 'exams',
   EXAMS_USERS: 'exams_users',
   USUARIOS: 'usuarios',

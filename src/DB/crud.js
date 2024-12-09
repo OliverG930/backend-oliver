@@ -143,8 +143,8 @@ const insertWhereV2 = async (table, data, where) => {
     // Ejecutar la consulta
     const result = await queryAsync(query, [table, ...values, table, ...whereValues])
     return result.affectedRows > 0
-      ? { message: 'Data inserted successfully' }
-      : { message: 'Data already exists' }
+      ? { message: 'Data inserted successfully', exists: false }
+      : { message: 'Data already exists', exists: true }
   } catch (error) {
     throw new Error(`Database operation failed: ${error.message}`)
   }

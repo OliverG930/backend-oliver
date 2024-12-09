@@ -174,4 +174,45 @@ const deleteTask = async (req, res) => {
     return responses.error(req, res, { message: 'error' }, 500)
   }
 }
-module.exports = { deleteTask, createTask, getTasks, getMyExams, getLessons, getLessonContent, getCourses, getCourse, getAllCourses, enrollCourse, getAll, all, getExams, enroll, getEnrolled, get, unroll, getRoomLessons, getContents }
+
+const getCompletedTasks = async (req, res) => {
+  const { taskId } = req.params
+  const { usuario_id } = req.user
+
+  try {
+    const result = await db.selectMultipleWheres(tables.TASKS_USERS, { user: usuario_id, tarea: Number(taskId) })
+    return responses.success(req, res, result, 200)
+  } catch (error) {
+    console.error(error.message)
+    return responses.error(req, res, { message: 'ocurrió un error' }, 500)
+  }
+}
+
+const saveCompletedTask = (req, res) => {
+  const { taskId } = req.params
+  const { usuario_id } = req.user
+
+  const values = {
+    user: usuario_id,
+    tarea: Number(taskId),
+    ...req.body
+  }
+
+  const where = {
+    user: usuario_id,
+    tarea: Number(taskId)
+  }
+
+  db.insertWhereV2(tables.TASKS_USERS, values, where)
+    .then(result => {
+      if (result.exists) {
+        return responses.error(req, res, result, 409)
+      }
+      return responses.success(req, res, result, 200)
+    }).catch(err => {
+      console.error(err)
+      return responses.error(req, res, err, 500)
+    })
+}
+
+module.exports = { saveCompletedTask, getCompletedTasks, deleteTask, createTask, getTasks, getMyExams, getLessons, getLessonContent, getCourses, getCourse, getAllCourses, enrollCourse, getAll, all, getExams, enroll, getEnrolled, get, unroll, getRoomLessons, getContents }

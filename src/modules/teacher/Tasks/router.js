@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
 const express = require('express')
 const router = express.Router()
@@ -57,12 +58,61 @@ router.post('/add/:id', async (request, response) => {
   responses.success(request, response, { insertId }, 200)
 })
 
+router.get('/content/:id', security(), async (req, res) => {
+  const { id } = req.params
+
+  // return responses.success(req, res, { message: 'tasks saved!' }, 200)
+  try {
+    const tasks = await db.selectOneWhere(TABLES.TASKS_CONTENT, { tarea: id })
+
+    return responses.success(req, res, tasks, 200)
+  } catch (error) {
+    console.error(error.message)
+    return responses.error(req, res, { message: 'content not found!' }, 404)
+  }
+})
+
+router.post('/content', security(), async (req, res) => {
+  const { tasks, task } = req.body
+  const data = {
+    tarea: task,
+    value: JSON.stringify(tasks)
+  }
+  // return responses.success(req, res, { message: 'tasks saved!' }, 200)
+  try {
+    const result = await db.insert(TABLES.TASKS_CONTENT, data)
+    return responses.success(req, res, { message: 'tasks saved!' }, 201)
+  } catch (error) {
+    console.error(error.message)
+    return responses.error(req, res, { message: 'tasks not saved!' }, 201)
+  }
+})
+
+router.patch('/content', security(), async (req, res) => {
+  const { task, tasks } = req.body
+
+  // return responses.success(req, res, { message: 'tasks saved!' }, 200)
+  try {
+    const update = await db.update(TABLES.TASKS_CONTENT, { value: JSON.stringify(tasks) }, { tarea: task })
+    return responses.success(req, res, update, 200)
+  } catch (error) {
+    console.error(error.message)
+    return responses.error(req, res, { message: 'content not found!' }, 404)
+  }
+})
+
 router.post('/content/generate', security(), async (req, res) => {
-  const { task, type, text } = req.body
+  const { task, type, text, amount } = req.body
+
+  if (!type) return responses.error(req, res, {}, 404)
+  if (!text) return responses.error(req, res, {}, 404)
+  if (!task) return responses.error(req, res, {}, 404)
+  if (!amount) return responses.error(req, res, {}, 404)
+
   const level = 1
 
   const message = `
-  Genera un conjunto de preguntas en formato JSON para una tarea de inglés de nivel ${level}, con un total de ${1} preguntas. seguir los criterios detallados a continuación.
+  Genera ${amount} preguntas en formato JSON para una tarea de inglés de nivel ${level}, con un total de ${1} preguntas. seguir los criterios detallados a continuación.
 
   **Instrucciones Generales para la Creación de Preguntas:**
   1. **Formato de Preguntas:**
@@ -134,6 +184,10 @@ router.post('/content/generate', security(), async (req, res) => {
 
 `
 
+  if (message.length > 2999) {
+    message.slice(0, 2999)
+  }
+
   const completion = await openai.chat.completions.create({
     messages: [
       {
@@ -150,6 +204,7 @@ router.post('/content/generate', security(), async (req, res) => {
 
   return responses.success(req, res, JSON.parse(completion.choices[0].message.content), 201)
 })
+
 router.get('/content/file/:task', security(), async (req, res) => {
   const { task } = req.params
   const files = await db.select(TABLES.FILES, { task })

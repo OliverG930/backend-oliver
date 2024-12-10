@@ -10,22 +10,18 @@ const security = require('../../../middlewares/security')
 router.get('/', security(), getAllCourses)
 
 router.get('/courses', security(), getCourses)
-
 router.get('/courses/:id', security(), getCourse)
-
 router.get('/courses/enroll/:id', security(), enrollCourse)
-
 router.get('/courses/:id/lessons', security(), getLessons)
+router.get('/courses/lessons/:id/contents', security(), getContents)
 
 router.get('/lessons/:id', security(), getLessonContent)
 
-router.get('/courses/lessons/:id/contents', security(), getContents)
 router.get('/:roomId/myExams', security(), getMyExams)
 router.get('/:roomId/tasks', security(), getTasks)
 router.post('/:roomId/tasks', security(), createTask)
 
 router.delete('/tasks/:taskId', security(), deleteTask)
-
 router.get('/tasks/:taskId/completed', security(), getCompletedTasks)
 router.post('/tasks/:taskId/completed', security(), saveCompletedTask)
 // antiguos

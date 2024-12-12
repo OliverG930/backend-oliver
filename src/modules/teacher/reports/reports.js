@@ -17,39 +17,40 @@ async function generateReport (req, res) {
     return res.status(400).json({ error: 'Faltan parámetros necesarios: ne, id_aula' })
   }
 
-  const query = `
-    WITH
-      tareas_points AS (
-        SELECT user_id, SUM(points) AS total_tareas_points
-        FROM tareas_content
-        GROUP BY user_id
-      ),
-      exam_points AS (
-        SELECT user_id, SUM(points) AS total_exam_points
-        FROM exams_users
-        GROUP BY user_id
-      )
-    SELECT
-      av.nombre_aula,
-      CONCAT(u.nombre, ' ', u.apellido) AS estudiante,
-      CONCAT(d.nombre, ' ', d.apellido) AS profesor,
-      IFNULL(c.comentario, 'Sin comentarios') AS comentario,
-      DATE_FORMAT(NOW(), '%d/%m/%Y') AS fecha_actual,
-      COALESCE(tp.total_tareas_points, 0) AS tareas_points,
-      COALESCE(ep.total_exam_points, 0) AS exam_points,
-      COALESCE(tp.total_tareas_points, 0) + COALESCE(ep.total_exam_points, 0) AS total_points
-    FROM
-      usuarios AS u
-    JOIN aula_virtual AS av ON av.aula_id = ?
-    LEFT JOIN comentarios AS c ON c.user_id = u.usuario_id AND c.room = av.aula_id
-    JOIN usuarios AS d ON av.usuario_id = d.usuario_id AND d.rol_id = 2
-    LEFT JOIN tareas_points AS tp ON tp.user_id = u.usuario_id
-    LEFT JOIN exam_points AS ep ON ep.user_id = u.usuario_id
-    WHERE
-      u.rol_id = 1
-      AND CONCAT(u.nombre, ' ', u.apellido) = ?
-      AND CONCAT(d.nombre, ' ', d.apellido) = ?;
-  `
+  const query =`
+  WITH
+    tareas_points AS (
+      SELECT user, SUM(points) AS total_tareas_points
+      FROM tareas_users
+      GROUP BY user
+    ),
+    exam_points AS (
+      SELECT user_id, SUM(points) AS total_exam_points
+      FROM exams_users
+      GROUP BY user_id
+    )
+  SELECT
+    av.nombre_aula,
+    CONCAT(u.nombre, ' ', u.apellido) AS estudiante,
+    CONCAT(d.nombre, ' ', d.apellido) AS profesor,
+    IFNULL(c.comentario, 'Sin comentarios') AS comentario,
+    DATE_FORMAT(NOW(), '%d/%m/%Y') AS fecha_actual,
+    COALESCE(tp.total_tareas_points, 0) AS tareas_points,
+    COALESCE(ep.total_exam_points, 0) AS exam_points,
+    COALESCE(tp.total_tareas_points, 0) + COALESCE(ep.total_exam_points, 0) AS total_points
+  FROM
+    usuarios AS u
+  JOIN aula_virtual AS av ON av.aula_id = ?
+  LEFT JOIN comentarios AS c ON c.user_id = u.usuario_id AND c.room = av.aula_id
+  JOIN usuarios AS d ON av.usuario_id = d.usuario_id AND d.rol_id = 2
+  LEFT JOIN tareas_points AS tp ON tp.user = u.usuario_id
+  LEFT JOIN exam_points AS ep ON ep.user_id = u.usuario_id
+  WHERE
+    u.rol_id = 1
+    AND CONCAT(u.nombre, ' ', u.apellido) = ?
+    AND CONCAT(d.nombre, ' ', d.apellido) = ?;
+`
+
 
   try {
     getConnection().query(query, [id_aula, ne, `${nombre} ${apellido}`], (err, rows) => {

@@ -95,25 +95,36 @@ router.get('/usuarios/:id', async (req, res) => {
 
 
 
-
 // Ruta para actualizar un usuario
-router.put('/update-usuario', (req, res) => {
-    const { usuarioId, nombre, apellido, correo, rol_id, estado } = req.body;
+router.patch('/update-usuario/:id', (req, res) => {
+    const usuarioId = req.params.id; // Obtener el ID del usuario desde los parámetros de la URL
+    const { nombre, apellido, correo, rol_id, estado } = req.body; // Obtener los campos del cuerpo de la solicitud
 
-    // Verificar que al menos uno de los campos a actualizar esté presente
-    if (!usuarioId) {
-        return res.status(400).json({ error: 'Falta el ID de usuario' });
+    // Verificar que el usuarioId esté presente y sea válido
+    if (!usuarioId || isNaN(usuarioId)) {
+        return res.status(400).json({ error: 'El ID de usuario es inválido o no se proporcionó' });
     }
 
-    // Llamar al método de actualización pasando los campos solo si están presentes
-    usuariosRev.updateUsuario(usuarioId, { nombre, apellido, correo, rol_id, estado }, (err, results) => {
+    // Verificar que al menos un campo a actualizar esté presente
+    if (!nombre && !apellido && !correo && !rol_id && !estado) {
+        return res.status(400).json({ error: 'Debe proporcionar al menos un campo para actualizar' });
+    }
+
+    // Llamar al método de actualización pasando los campos a actualizar
+    usuariosRev.updateUsuario(usuarioId, nombre, apellido, correo, rol_id, estado, (err, results) => {
         if (err) {
+            console.error('Error al actualizar el usuario:', err); // Log del error
             return res.status(500).json({ error: 'Error al actualizar el usuario', message: err.message });
         }
+
+        // Verificar si se realizaron cambios
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado o no se realizaron cambios' });
+        }
+
         res.json({ message: 'Usuario actualizado con éxito', data: results });
     });
 });
-
 
 
 

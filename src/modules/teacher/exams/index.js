@@ -1,3 +1,4 @@
+/* eslint-disable space-before-function-paren */
 const express = require('express')
 const router = express.Router()
 const responses = require('../../../red/responses')
@@ -5,7 +6,7 @@ const security = require('../../../middlewares/security')
 const { insert, select, deleteWhereID, update } = require('../../../DB/crud')
 const tables = require('../../../utils/tables')
 
-function getExams (roomID) {
+function getExams(roomID) {
   return select(tables.EXAMS, { roomID })
 }
 
@@ -17,7 +18,7 @@ router.get('/:roomID', security(), async (req, res) => {
   return responses.success(req, res, { message: 'success', exams }, 200)
 })
 
-function calculateTimestamp (days) {
+function calculateTimestamp(days) {
   if (isNaN(days) || days <= 0) {
     throw new Error('El número de días debe ser un entero positivo.')
   }
@@ -57,16 +58,19 @@ router.post('/save', security(), async (req, res) => {
   }
 })
 
-function deleteExam (examID) {
+function deleteExam(examID) {
   return deleteWhereID(tables.EXAMS, { id: examID })
 }
 
 router.post('/delete', security(), async (req, res) => {
   const { body } = req
 
-  const result = await deleteExam(body.examID)
-
-  return responses.success(req, res, { result }, 200)
+  try {
+    const result = await deleteExam(body.examID)
+    return responses.success(req, res, { result }, 200)
+  } catch (error) {
+    return responses.success(req, res, { message: error.message }, 404)
+  }
 })
 
 router.put('/update', security(), async (req, res) => {

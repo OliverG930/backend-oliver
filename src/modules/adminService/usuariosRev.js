@@ -64,7 +64,8 @@ const getUsuarioById = (usuarioId, callback) => {
 };
 
 
-const updateUsuario = (usuarioId, { nombre, apellido, correo, rol_id, estado }, callback) => {
+
+const updateUsuario = (usuarioId, nombre, apellido, correo, rol_id, estado, callback) => {
     // Validar que el usuarioId sea válido
     if (!usuarioId || isNaN(usuarioId)) {
         return callback(new Error("El ID de usuario no es válido"));
@@ -74,15 +75,15 @@ const updateUsuario = (usuarioId, { nombre, apellido, correo, rol_id, estado }, 
     const fields = [];
     const values = [];
 
-    // Solo añadir los campos que estén presentes
+    // Solo añadir los campos que estén presentes y sean válidos
     if (nombre) {
         fields.push("nombre = ?");
-        values.push(nombre);
+        values.push(nombre); // Asegúrate de que 'nombre' es un valor simple
     }
 
     if (apellido) {
         fields.push("apellido = ?");
-        values.push(apellido);
+        values.push(apellido); // Asegúrate de que 'apellido' es un valor simple
     }
 
     if (correo) {
@@ -90,12 +91,12 @@ const updateUsuario = (usuarioId, { nombre, apellido, correo, rol_id, estado }, 
         values.push(correo);
     }
 
-    if (estado) {
+    if (estado !== undefined && estado !== null) {
         fields.push("estado = ?");
         values.push(estado);
     }
 
-    if (rol_id) {
+    if (rol_id !== undefined && rol_id !== null) {
         fields.push("rol_id = ?");
         values.push(rol_id);
     }
@@ -112,8 +113,12 @@ const updateUsuario = (usuarioId, { nombre, apellido, correo, rol_id, estado }, 
     const query = `
         UPDATE ${TABLES.USUARIOS}
         SET ${fields.join(", ")}
-        WHERE usuario_id = ?
+        WHERE usuario_id = ?;
     `;
+
+    // Log de la consulta generada para depuración
+    console.log('Consulta SQL generada:', query);
+    console.log('Valores para la consulta:', values);
 
     // Ejecutar la consulta
     getConnection().query(query, values, (err, results) => {
@@ -122,15 +127,15 @@ const updateUsuario = (usuarioId, { nombre, apellido, correo, rol_id, estado }, 
             return callback(err);
         }
 
-        if (results.affectedRows === 0) {
-            return callback(new Error('El usuario no fue actualizado. Es posible que el ID no exista o los datos sean iguales.'));
+        // Verificar si se afectaron filas (es decir, si se actualizó algo)
+        if (results.changedRows === 0) {
+            return callback(null, { message: 'No hubo cambios, los datos ya eran iguales.' });
         }
 
         console.log('✅ Usuario actualizado con éxito:', results);
         callback(null, results); // Retorna los resultados de la actualización
     });
 };
-
 
 
 

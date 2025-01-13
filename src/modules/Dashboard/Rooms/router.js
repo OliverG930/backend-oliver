@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const responses = require('../../../red/responses')
-const { saveCompletedTask, getCompletedTasks, deleteTask, createTask, getTasks, getContents, getMyExams, getLessonContent, getCourses, getCourse, getAllCourses, enrollCourse, enroll, unroll, getLessons, getRoomLessons, getExams } = require('./controller')
+const { saveCompletedTask, getCompletedTasks, deleteTask, createTask, getTasks, getContents, getMyExams, getLessonContent, getCourses, getCourse, getAllCourses, enrollCourse, enroll, unroll, getLessons, getRoomLessons, getExams, getCourseInfo } = require('./controller')
 
 const security = require('../../../middlewares/security')
 
@@ -14,6 +14,7 @@ router.get('/courses/:id', security(), getCourse)
 router.get('/courses/enroll/:id', security(), enrollCourse)
 router.get('/courses/:id/lessons', security(), getLessons)
 router.get('/courses/lessons/:id/contents', security(), getContents)
+router.get('/courses/info/:id/:room', security(), getCourseInfo)
 
 router.get('/lessons/:id', security(), getLessonContent)
 

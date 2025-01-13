@@ -26,7 +26,8 @@ const login = async (body) => {
         email: data.correo,
         type: data.rol_id,
         pic: data.userimage,
-        bg: data.userbackground
+        bg: data.userbackground,
+        state: data.estado
       }
 
       // se asigna el token al usuario

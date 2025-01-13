@@ -4,7 +4,7 @@ const TABLES = require('../../../utils/tables')
 const responses = require('../../../red/responses')
 const tables = require('../../../utils/tables')
 
-async function getAllCourses (req, res) {
+async function getAllCourses(req, res) {
   try {
     const rooms = await db.get(TABLES.AULA_VIRTUAL)
     return responses.success(req, res, { rooms }, 200)
@@ -14,14 +14,14 @@ async function getAllCourses (req, res) {
   }
 }
 
-async function getAll (req, res) {
+async function getAll(req, res) {
   const { id } = req.params
 
   const data = await get(id)
   responses.success(req, res, { courses: data }, 200)
 }
 
-async function getCourses (req, res) {
+async function getCourses(req, res) {
   try {
     const { usuario_id } = req.user
 
@@ -32,7 +32,7 @@ async function getCourses (req, res) {
   }
 }
 
-async function getCourse (req, res) {
+async function getCourse(req, res) {
   const { id } = req.params
   try {
     const result = await db.selectOneWhere(TABLES.COURSES, { id })
@@ -42,7 +42,7 @@ async function getCourse (req, res) {
   }
 }
 
-async function enrollCourse (req, res) {
+async function enrollCourse(req, res) {
   const { id } = req.params
   const { usuario_id } = req.user
 
@@ -59,7 +59,7 @@ async function enrollCourse (req, res) {
   }
 }
 
-async function getLessonContent (req, res) {
+async function getLessonContent(req, res) {
   const { id } = req.params
   try {
     const result = await db.select(TABLES.LESSONS_CONTENT, { lesson_id: id })
@@ -70,7 +70,7 @@ async function getLessonContent (req, res) {
   }
 }
 
-async function getLessons (req, res) {
+async function getLessons(req, res) {
   const { id } = req.params
   try {
     const lessons = await db.select(TABLES.LESSONS, { room: id })
@@ -81,7 +81,7 @@ async function getLessons (req, res) {
   }
 }
 
-async function getContents (req, res) {
+async function getContents(req, res) {
   const { id } = req.params
   try {
     const contents = await db.select(TABLES.LESSONS_CONTENT, { lesson_id: id })
@@ -215,4 +215,16 @@ const saveCompletedTask = (req, res) => {
     })
 }
 
-module.exports = { saveCompletedTask, getCompletedTasks, deleteTask, createTask, getTasks, getMyExams, getLessons, getLessonContent, getCourses, getCourse, getAllCourses, enrollCourse, getAll, all, getExams, enroll, getEnrolled, get, unroll, getRoomLessons, getContents }
+const getCourseInfo = async (req, res) => {
+  try {
+    const { id, room } = req.params
+
+    const user = await db.select(TABLES.USUARIOS, { usuario_id: id })
+    const alumnos = await db.select(TABLES.COURSES, { aula: room })
+    return responses.success(req, res, { name: user[0].nombre, userpic: user[0].userimage, students: alumnos.length })
+  } catch (e) {
+    return responses.error(req, res, { message: e.message }, 500)
+  }
+}
+
+module.exports = { getCourseInfo, saveCompletedTask, getCompletedTasks, deleteTask, createTask, getTasks, getMyExams, getLessons, getLessonContent, getCourses, getCourse, getAllCourses, enrollCourse, getAll, all, getExams, enroll, getEnrolled, get, unroll, getRoomLessons, getContents }

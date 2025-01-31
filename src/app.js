@@ -18,6 +18,7 @@ const errors = require('./red/errors')
 const profileRouter = require('./modules/profile/index') // para el profile
 const reportRouter = require('./modules/teacher/reports')
 const adminServiceRouter = require('./modules/adminservice/index.js')
+const activationRouter = require('./modules/activations/admin.js')
 // create ap with express
 // DOC: https://expressjs.com/
 const app = express()
@@ -70,6 +71,7 @@ app.use('/profile', profileRouter) // para el profile
 app.use('/api/profile', profileRouter) // para el profile
 app.use('/api', reportRouter)
 app.use('/admin', adminServiceRouter)
+app.use('/act',activationRouter)
 app.use(errors)
 
 module.exports = app

@@ -13,5 +13,6 @@ module.exports = {
   EXAMS_USERS: 'exams_users',
   USUARIOS: 'usuarios',
   COMMENTS: 'comentarios',
-  VERIFICATIONS: 'verifications'
+  VERIFICATIONS: 'verifications',
+  ROLES: 'roles'
 }

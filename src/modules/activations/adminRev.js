@@ -31,7 +31,8 @@ const getVerificationWithImages = async (id) => {
                 CONCAT(u.nombre, ' ', u.apellido) AS nombre_completo, 
                 u.correo, 
                 v.verified, 
-                v.state, 
+                v.state,
+                v.state_message, 
                 v.img_1, 
                 v.img_2,
                 u.estado
@@ -123,10 +124,46 @@ const updateVerificationState = async (id, state, verified, state_message) => {
     }
 };
 
+const deleteImage = async (id, imageColumn) => {
+    try {
+        // Verificar que 'imageColumn' sea válido (img_1 o img_2)
+        if (imageColumn !== 'img_1' && imageColumn !== 'img_2') {
+            throw new Error('Nombre de columna de imagen no válido');
+        }
+
+        // Construcción de la consulta SQL para actualizar la columna de imagen
+        // Si es img_1 o img_2 o ambas
+        const query = `
+           UPDATE ${TABLES.VERIFICATIONS}
+           SET ${imageColumn} = NULL
+           WHERE id = ? AND (${imageColumn} IS NOT NULL)
+        `;
+
+        const connection = await getConnection();
+        const [result] = await connection.promise().query(query, [id]);
+
+        if (result.affectedRows === 0) {
+            throw new Error('No se encontró ninguna verificación con el ID proporcionado o la imagen ya está vacía');
+        }
+
+        return { message: 'Imagen eliminada correctamente', affectedRows: result.affectedRows };
+    } catch (error) {
+        console.error('Error al eliminar la imagen:', error);
+        throw error;
+    }
+};
+
+
+
+
+
+
 
 module.exports = {
     getAllVerifications,
     getVerificationWithImages,
     updateVerificationState,
-    updateEstadoVef
+    updateEstadoVef,
+    deleteImage
+  
 };

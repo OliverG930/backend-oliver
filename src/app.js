@@ -71,7 +71,7 @@ app.use('/profile', profileRouter) // para el profile
 app.use('/api/profile', profileRouter) // para el profile
 app.use('/api', reportRouter)
 app.use('/admin', adminServiceRouter)
-app.use('/act',activationRouter)
+app.use('/act', activationRouter)
 app.use(errors)
 
 module.exports = app

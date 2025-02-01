@@ -1,3 +1,4 @@
+/* eslint-disable space-before-function-paren */
 /* eslint-disable camelcase */
 const db = require('../../../DB/crud')
 const TABLES = require('../../../utils/tables')
@@ -140,8 +141,20 @@ const getMyExams = async (req, res) => {
 const getTasks = async (req, res) => {
   const { roomId } = req.params
   // const { user } = req
-  console.log(roomId)
   const result = await db.select(tables.TASKS, { id_room: roomId })
+  return responses.success(req, res, result, 200)
+}
+
+const getTask = async (req, res) => {
+  const { taskId } = req.params
+  const result = await db.selectOneWhere(tables.TASKS_CONTENT, { tarea: taskId })
+  return responses.success(req, res, result, 200)
+}
+
+const getFeedback = async (req, res) => {
+  const { taskId } = req.params
+  const { usuario_id } = req.user
+  const result = await db.selectOneMultipleWheres(tables.FEEDBACK, { usuario_id, task: taskId })
   return responses.success(req, res, result, 200)
 }
 
@@ -180,7 +193,7 @@ const getCompletedTasks = async (req, res) => {
   const { usuario_id } = req.user
 
   try {
-    const result = await db.selectMultipleWheres(tables.TASKS_USERS, { user: usuario_id, tarea: Number(taskId) })
+    const result = await db.selectOneMultipleWheres(tables.TASKS_USERS, { user: usuario_id, tarea: Number(taskId) })
     return responses.success(req, res, result, 200)
   } catch (error) {
     console.error(error.message)
@@ -227,4 +240,4 @@ const getCourseInfo = async (req, res) => {
   }
 }
 
-module.exports = { getCourseInfo, saveCompletedTask, getCompletedTasks, deleteTask, createTask, getTasks, getMyExams, getLessons, getLessonContent, getCourses, getCourse, getAllCourses, enrollCourse, getAll, all, getExams, enroll, getEnrolled, get, unroll, getRoomLessons, getContents }
+module.exports = { getFeedback, getTask, getCourseInfo, saveCompletedTask, getCompletedTasks, deleteTask, createTask, getTasks, getMyExams, getLessons, getLessonContent, getCourses, getCourse, getAllCourses, enrollCourse, getAll, all, getExams, enroll, getEnrolled, get, unroll, getRoomLessons, getContents }

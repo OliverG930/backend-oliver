@@ -1,7 +1,7 @@
 const mysql = require('./mysql')
 const connection = mysql.conn()
 
-function getConnection () {
+function getConnection() {
   return connection
 }
 
@@ -29,6 +29,17 @@ const selectMultipleWheres = (table, multipleWheres = {}) => {
   return new Promise((resolve, reject) => {
     connection.query(`SELECT * FROM ${table} WHERE ${inWhere}`, values, (err, result) => {
       return err ? reject(err) : resolve(result)
+    })
+  })
+}
+
+const selectOneMultipleWheres = (table, multipleWheres = {}) => {
+  const inWhere = Object.keys(multipleWheres).map(key => `${key} = ?`).join(' AND ')
+  const values = Object.values(multipleWheres)
+
+  return new Promise((resolve, reject) => {
+    connection.query(`SELECT * FROM ${table} WHERE ${inWhere}`, values, (err, result) => {
+      return err ? reject(err) : resolve(result[0])
     })
   })
 }
@@ -191,5 +202,6 @@ module.exports = {
   selectWithJoin,
   getConnection,
   selectResume,
-  selectMultipleWheres
+  selectMultipleWheres,
+  selectOneMultipleWheres
 }

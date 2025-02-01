@@ -1,9 +1,13 @@
+/* eslint-disable camelcase */
 const express = require('express')
 const router = express.Router()
 const responses = require('../../red/responses')
 const { writeFileSync } = require('node:fs')
+const db = require('../../DB/crud')
 
 const OpenAI = require('openai')
+const tables = require('../../utils/tables')
+const security = require('../../middlewares/security')
 
 const openai = new OpenAI({ apiKey: process.env.API_KEY })
 
@@ -358,6 +362,56 @@ router.post('/exam/analice', async (req, res) => {
 
   // console.log(JSON.stringify(examen))
   responses.success(req, res, { res: completion.choices[0].message.content }, 200)
+})
+
+router.post('/feedback/:taskId', security(), async (req, res) => {
+  const { body } = req
+  const { taskId } = req.params
+  const { usuario_id } = req.user
+
+  const messageRes = `actúa como un maestro de ingles y analiza el siguiente json y haz un resumen rápido del nivel de un estudiante de ingles al que se le dieron unos ejercicios de ingles para detectar su nivel a continuación te envió el json como stringify: "${JSON.stringify(body)}".
+  Sigue los siguientes puntos, donde correct es si acertó la pregunta, title question es la pregunta.
+  1. solo responde un json.
+  2. el formato del json debe ser asi: correct, incorrect, percentage (porcentaje de acierto), englishLevel, obs: (observaciones), improvementsList.
+  3. responde en segunda persona
+  4. recuerda 'correct' determina si es correcta o no la respuesta.
+  5. que las observación estén bien explicadas de 50 a 100 palabras.
+  6. siempre responde en español
+  `
+
+  const completion = await openai.chat.completions.create({
+    messages: [
+      {
+        role: 'user', content: messageRes
+      }
+    ],
+    model: 'gpt-4o',
+    response_format: { type: 'json_object' }
+  })
+
+  const { content } = completion.choices[0].message
+
+  const where = {
+    usuario_id,
+    task: Number(taskId)
+  }
+
+  const values = {
+    response: content,
+    usuario_id,
+    task: taskId
+  }
+
+  db.insertWhereV2(tables.FEEDBACK, values, where)
+    .then(result => {
+      if (result.exists) {
+        return responses.error(req, res, result, 409)
+      }
+      return responses.success(req, res, { content }, 200)
+    }).catch(err => {
+      console.error(err)
+      return responses.error(req, res, err, 500)
+    })
 })
 
 module.exports = router

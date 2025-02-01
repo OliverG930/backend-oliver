@@ -21,13 +21,16 @@ const addVerificationImg = async ({ type, url, userId }) => {
 
   if (type === '1') {
     if (verification) {
-      removeFile(url)
-      return { error: true, message: 'Ya se encuentra en proceso' }
+      if (verification.img_1 !== null) {
+        removeFile(url)
+        return { error: true, message: 'Ya se encuentra en proceso' }
+      } else {
+        return await db.update(tables.VERIFICATIONS, { img_1: url }, { usuario_id: userId })
+      }
     }
 
     return await db.insert(tables.VERIFICATIONS, { usuario_id: userId, img_1: url })
   } else if (type === '2') {
-    console.log(verification)
     if (verification.img_2 !== null) {
       removeFile(url)
       return { error: true, message: '2 Ya se encuentra en proceso' }
@@ -48,7 +51,7 @@ const removeFile = (filename) => {
     if (err) {
       throw err
     } else {
-      console.log('Successfully deleted the file.')
+      // console.log('Successfully deleted the file.')
     }
   })
 }

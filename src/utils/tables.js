@@ -14,5 +14,6 @@ module.exports = {
   USUARIOS: 'usuarios',
   COMMENTS: 'comentarios',
   VERIFICATIONS: 'verifications',
-  ROLES: 'roles'
+  ROLES: 'roles',
+  FEEDBACK: 'retroalimentacion'
 }

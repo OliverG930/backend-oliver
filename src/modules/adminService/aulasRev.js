@@ -1,8 +1,8 @@
-//Este es: aulasRev.js
+
 const { getConnection } = require('../../DB/crud');
 const TABLES = require('../../utils/tables');
 
-// Función para obtener todas las aulas
+// Función para obtener todas las aulas.
 const getAllAulas = (callback) => {
     const query = `
         SELECT 
@@ -21,7 +21,7 @@ const getAllAulas = (callback) => {
     });
 };
 
-// Función para obtener un usuario por su ID
+// Función para obtener un usuario por su ID.
 const getAulaById = (aulaId, callback) => {
     const query = `
         SELECT 
@@ -33,14 +33,14 @@ const getAulaById = (aulaId, callback) => {
 
    
      getConnection().query(query, [aulaId], (err, results) => {
-        //connection.release(); // Liberar la conexión
+       
         if (err) {
             return callback(err);
         }
         if (results.length === 0) {
-            return callback(null, null); // No se encontró el usuario
+            return callback(null, null); // No se encontró el usuario buscado
         }
-        callback(null, results[0]); // Retorna el primer resultado
+        callback(null, results[0]); 
     });
     
 };
@@ -56,7 +56,7 @@ const updateAula = (aulaId, nombre_aula, aula_descripcion, callback) => {
         if (err) {
             return callback(err);
         }
-        callback(null, results); // Retorna los resultados de la actualización
+        callback(null, results); // Retorna los resultados de la actualización del nombre del aula.
     });
 };
 
@@ -71,7 +71,7 @@ const updateDescripcionAula = (aulaId, aula_descripcion, callback) => {
         if (err) {
             return callback(err);
         }
-        callback(null, results); // Retorna los resultados de la actualización
+        callback(null, results); // Retorna los resultados de la actualización de la descripcion. 
     });
 };
 
@@ -87,7 +87,7 @@ const updateNombreAula = (aulaId, nombre_aula, callback) => {
         if (err) {
             return callback(err);
         }
-        callback(null, results); // Retorna los resultados de la actualización
+        callback(null, results); // Retorna los resultados de la actualización de nuestra aula.
     });
 };
 
@@ -104,7 +104,7 @@ const deleteAula = (aulaId, callback) => {
         if (err) {
             return callback(err);
         }
-        callback(null, results); // Retorna los resultados de la eliminación
+        callback(null, results); // Retorna los resultados de la eliminación del aula.
     });
 };
 

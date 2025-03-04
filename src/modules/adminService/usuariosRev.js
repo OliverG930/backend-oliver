@@ -1,4 +1,4 @@
-//Este es: usuariosRev.js
+
 const { getConnection, select } = require('../../DB/crud');
 const TABLES = require('../../utils/tables');
 

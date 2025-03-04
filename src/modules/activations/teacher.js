@@ -1,6 +1,4 @@
-/* eslint-disable no-throw-literal */
-/* eslint-disable camelcase */
-const express = require('express')
+
 const { uploadController, addVerificationImg, inVerification } = require('./teacher.controller')
 const router = express.Router()
 const security = require('../../middlewares/security')

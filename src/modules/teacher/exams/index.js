@@ -76,11 +76,20 @@ router.post('/delete', security(), async (req, res) => {
 router.put('/update', security(), async (req, res) => {
   const { body } = req
 
-  console.log(body)
-
   const data = {
     exam: JSON.stringify(body.exam),
     config: JSON.stringify(body.config)
+  }
+  await update(tables.EXAMS, data, { id: Number(body.id) })
+
+  return responses.success(req, res, { message: 'update' }, 200)
+})
+
+router.put('/post', security(), async (req, res) => {
+  const { body } = req
+
+  const data = {
+    published: 1
   }
   await update(tables.EXAMS, data, { id: Number(body.id) })
 

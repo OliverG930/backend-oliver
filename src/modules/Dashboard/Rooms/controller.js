@@ -119,8 +119,7 @@ const unroll = (id) => {
 }
 
 const getExams = (id) => {
-  console.log(TABLES.EXAMS, { roomID: id })
-  return db.select(TABLES.EXAMS, { roomID: id })
+  return db.selectMultipleWheres(TABLES.EXAMS, { roomID: id, published: 0 })
 }
 
 const getMyExams = async (req, res) => {

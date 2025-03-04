@@ -1,9 +1,8 @@
-/* eslint-disable camelcase */
-// Este es: index.js
+
 const express = require('express')
 const router = express.Router()
-const aulasRev = require('./aulasRev') // Asegúrate de que la ruta sea correcta
-const usuariosRev = require('./usuariosRev') // Asegúrate de que la ruta sea correcta
+const aulasRev = require('./aulasRev') 
+const usuariosRev = require('./usuariosRev') 
 
 // Ruta para obtener todas las aulas
 router.get('/aulas', (req, res) => {

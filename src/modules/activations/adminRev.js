@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+
 const { getConnection } = require('../../DB/crud')
 const TABLES = require('../../utils/tables')
 

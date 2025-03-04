@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+
 const db = require('../../DB/crud')
 const multer = require('multer')
 const path = require('path')

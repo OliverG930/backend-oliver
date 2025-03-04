@@ -5,5 +5,5 @@ const pc = require('picocolors')
 const server = http.createServer(app)
 
 server.listen(app.get('port'), () => {
-  console.log(pc.green(`server on port http://lolcahost:${app.get('port')}`))
+  console.log(pc.green(`server on port http://localhost:${app.get('port')}`))
 })
